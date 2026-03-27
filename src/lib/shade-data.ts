@@ -309,6 +309,74 @@ export const miracleBalmUrls: Record<string, string> = {
     "https://jonesroadbeauty.com/products/miracle-balm?variant=au-naturel",
 };
 
+// Real complexion shade names by skin tone (from CX agent recommendations)
+export interface ComplexionShadeMap {
+  wtfShade: string;
+  facePencilFace: string;
+  facePencilEye: string;
+  neutralizer: string;
+  tintedPowder: string;
+}
+
+export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
+  Pale: {
+    wtfShade: "Porcelain",
+    facePencilFace: "03-04",
+    facePencilEye: "02-03",
+    neutralizer: "Fair Pink",
+    tintedPowder: "Light",
+  },
+  Fair: {
+    wtfShade: "Fair",
+    facePencilFace: "05",
+    facePencilEye: "03-04",
+    neutralizer: "Fair Pink / Fair Peach",
+    tintedPowder: "Light",
+  },
+  Light: {
+    wtfShade: "Light",
+    facePencilFace: "07-08",
+    facePencilEye: "04-06",
+    neutralizer: "Light Peachy Pink",
+    tintedPowder: "Light",
+  },
+  "Light-Medium": {
+    wtfShade: "Beige",
+    facePencilFace: "08-10",
+    facePencilEye: "06-09",
+    neutralizer: "Light Peachy Pink",
+    tintedPowder: "Light",
+  },
+  Medium: {
+    wtfShade: "Medium",
+    facePencilFace: "09-12",
+    facePencilEye: "09-11",
+    neutralizer: "Medium Peachy Pink",
+    tintedPowder: "Medium",
+  },
+  "Medium-Dark": {
+    wtfShade: "Medium Honey",
+    facePencilFace: "13-15",
+    facePencilEye: "11-13",
+    neutralizer: "Medium Peachy Pink",
+    tintedPowder: "Medium",
+  },
+  Dark: {
+    wtfShade: "Rich",
+    facePencilFace: "17-18",
+    facePencilEye: "15-17",
+    neutralizer: "Dark Apricot",
+    tintedPowder: "Medium-Dark",
+  },
+  Deep: {
+    wtfShade: "Espresso",
+    facePencilFace: "18",
+    facePencilEye: "17",
+    neutralizer: "Dark Apricot",
+    tintedPowder: "Dark",
+  },
+};
+
 // Shade color swatches for visual display
 export const shadeSwatches: Record<string, string> = {
   Flushed: "#d4838c",

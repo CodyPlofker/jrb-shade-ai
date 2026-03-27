@@ -257,6 +257,7 @@ export function Results({ result, image, onRetry }: ResultsProps) {
             const product =
               complexionProducts[complexion.hero.heroProduct];
             if (!product) return null;
+            const shadeLabel = complexion.shades?.wtfShade;
             return (
               <div>
                 <p
@@ -265,6 +266,14 @@ export function Results({ result, image, onRetry }: ResultsProps) {
                 >
                   {product.name}
                 </p>
+                {shadeLabel && (
+                  <p
+                    className="text-sm font-semibold text-[var(--jrb-brown)] mb-2"
+                    style={{ fontFamily: "system-ui, sans-serif" }}
+                  >
+                    Shade: {shadeLabel}
+                  </p>
+                )}
                 <p
                   className="text-sm text-[var(--jrb-muted)] mb-3 leading-relaxed"
                   style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}
@@ -356,6 +365,14 @@ export function Results({ result, image, onRetry }: ResultsProps) {
           >
             The Neutralizer
           </p>
+          {complexion.shades?.neutralizer && (
+            <p
+              className="text-sm font-semibold text-[var(--jrb-brown)] mb-2"
+              style={{ fontFamily: "system-ui, sans-serif" }}
+            >
+              Shade: {complexion.shades.neutralizer}
+            </p>
+          )}
           <p
             className="text-sm text-[var(--jrb-muted)] mb-3"
             style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}
@@ -390,6 +407,15 @@ export function Results({ result, image, onRetry }: ResultsProps) {
           >
             The Face Pencil
           </p>
+          {complexion.shades && (
+            <p
+              className="text-sm font-semibold text-[var(--jrb-brown)] mb-2"
+              style={{ fontFamily: "system-ui, sans-serif" }}
+            >
+              Shade {complexion.shades.facePencilFace} (face) / Shade{" "}
+              {complexion.shades.facePencilEye} (under eye)
+            </p>
+          )}
           <p
             className="text-sm text-[var(--jrb-muted)] mb-3"
             style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}

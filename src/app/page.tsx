@@ -30,6 +30,13 @@ export interface ShadeResult {
       heroProduct: string;
       neutralizer: string;
     }>;
+    shades?: {
+      wtfShade: string;
+      facePencilFace: string;
+      facePencilEye: string;
+      neutralizer: string;
+      tintedPowder: string;
+    };
     needsNeutralizer: boolean;
   };
 }

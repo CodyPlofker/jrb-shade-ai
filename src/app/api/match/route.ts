@@ -6,6 +6,7 @@ import {
   getMBShades,
   getComplexionRecs,
   getHeroComplexionRec,
+  complexionShadesByTone,
 } from "@/lib/shade-data";
 
 const anthropic = new Anthropic();
@@ -193,6 +194,7 @@ export async function POST(request: NextRequest) {
       complexion: {
         hero: heroComplexion,
         allOptions: complexionRecs,
+        shades: complexionShadesByTone[skinTone],
         needsNeutralizer: undertone !== "Warm",
       },
     });
