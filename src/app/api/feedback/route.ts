@@ -1,6 +1,12 @@
 import { NextRequest } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+const FEEDBACK_KEY = "shade-feedback";
 
 export interface FeedbackEntry {
   id: string;
@@ -21,23 +27,7 @@ export interface FeedbackEntry {
   ethnicity: string;
   notes: string;
   hasImage: boolean;
-}
-
-// Use /tmp for persistence within a single serverless function lifecycle
-// Plus console.log as a permanent backup in Vercel function logs
-const FEEDBACK_FILE = path.join("/tmp", "shade-feedback.json");
-
-async function readFeedback(): Promise<FeedbackEntry[]> {
-  try {
-    const data = await fs.readFile(FEEDBACK_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-async function writeFeedback(entries: FeedbackEntry[]): Promise<void> {
-  await fs.writeFile(FEEDBACK_FILE, JSON.stringify(entries, null, 2));
+  imageData?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -63,23 +53,18 @@ export async function POST(request: NextRequest) {
       ethnicity: body.ethnicity || "",
       notes: body.notes || "",
       hasImage: !!body.imageData,
+      imageData: body.imageData || undefined,
     };
 
-    // Always log to Vercel function logs — this is the permanent record
-    console.log("=== SHADE FEEDBACK SUBMISSION ===");
-    console.log(JSON.stringify(entry, null, 2));
-    // Log image separately (base64 thumbnail) so we can retrieve it from logs if needed
-    if (body.imageData) {
-      console.log("=== FEEDBACK IMAGE (base64 thumbnail) ===");
-      console.log(body.imageData);
-      console.log("=== END IMAGE ===");
-    }
-    console.log("=== END FEEDBACK ===");
+    // Save to Redis — each entry stored as a hash member keyed by ID
+    await redis.hset(FEEDBACK_KEY, { [entry.id]: JSON.stringify(entry) });
 
-    // Also save to /tmp file for GET retrieval within same function lifecycle
-    const existing = await readFeedback();
-    existing.push(entry);
-    await writeFeedback(existing);
+    // Also log to Vercel function logs as backup
+    const logEntry = { ...entry };
+    delete logEntry.imageData; // Don't log base64 to console
+    console.log("=== SHADE FEEDBACK ===");
+    console.log(JSON.stringify(logEntry, null, 2));
+    console.log("=== END ===");
 
     return Response.json({ success: true, id: entry.id }, { status: 201 });
   } catch (error) {
@@ -92,12 +77,36 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  const entries = await readFeedback();
-  entries.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+  try {
+    const allData = await redis.hgetall(FEEDBACK_KEY);
 
-  return Response.json({
-    count: entries.length,
-    feedback: entries,
-    note: "Entries persist in /tmp within a function lifecycle. All submissions are also permanently logged to Vercel function logs (vercel logs --follow).",
-  });
+    if (!allData || Object.keys(allData).length === 0) {
+      return Response.json({ count: 0, feedback: [] });
+    }
+
+    const entries: FeedbackEntry[] = Object.values(allData).map((v) => {
+      if (typeof v === "string") return JSON.parse(v);
+      return v as FeedbackEntry;
+    });
+
+    // Sort newest first
+    entries.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+
+    // Strip image data from list view to keep response small
+    const cleaned = entries.map((e) => {
+      const { imageData, ...rest } = e;
+      return rest;
+    });
+
+    return Response.json({
+      count: cleaned.length,
+      feedback: cleaned,
+    });
+  } catch (error) {
+    console.error("Feedback read error:", error);
+    return Response.json(
+      { error: "Failed to read feedback" },
+      { status: 500 }
+    );
+  }
 }
