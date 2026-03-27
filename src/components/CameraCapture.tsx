@@ -220,7 +220,8 @@ export function CameraCapture({ onCapture, error }: CameraCaptureProps) {
           <div className="flex flex-col gap-3">
             <button
               onClick={handleConfirm}
-              className="jrb-button jrb-button-primary w-full"
+              className="jrb-button w-full"
+              style={{ background: "#1a1a1a", color: "#fff", borderColor: "#1a1a1a" }}
             >
               Find My Shades
             </button>
