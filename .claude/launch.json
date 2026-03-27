@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "shade-ai",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["next", "dev", "-p", "3847"],
+      "port": 3847
+    }
+  ]
+}
