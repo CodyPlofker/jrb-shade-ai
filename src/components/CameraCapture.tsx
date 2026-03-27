@@ -177,7 +177,7 @@ export function CameraCapture({ onCapture, error }: CameraCaptureProps) {
       {/* Camera mode */}
       {mode === "camera" && (
         <div className="w-full">
-          <div className="camera-viewfinder aspect-[3/4] bg-black rounded-lg mb-4">
+          <div className="camera-viewfinder aspect-square bg-black rounded-lg mb-4">
             <video
               ref={videoRef}
               autoPlay
@@ -210,25 +210,25 @@ export function CameraCapture({ onCapture, error }: CameraCaptureProps) {
       {/* Preview mode */}
       {mode === "preview" && previewImage && (
         <div className="w-full">
-          <div className="aspect-[3/4] bg-black rounded-lg mb-4 overflow-hidden">
+          <div className="aspect-square bg-black rounded-lg mb-4 overflow-hidden">
             <img
               src={previewImage}
               alt="Your selfie"
               className="w-full h-full object-cover rounded-lg"
             />
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={handleRetake}
-              className="jrb-button jrb-button-secondary flex-1"
-            >
-              Retake
-            </button>
+          <div className="flex flex-col gap-3">
             <button
               onClick={handleConfirm}
-              className="jrb-button jrb-button-primary flex-1"
+              className="jrb-button jrb-button-primary w-full"
             >
               Find My Shades
+            </button>
+            <button
+              onClick={handleRetake}
+              className="jrb-button jrb-button-secondary w-full"
+            >
+              Retake
             </button>
           </div>
         </div>

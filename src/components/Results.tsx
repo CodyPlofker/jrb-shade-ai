@@ -50,8 +50,15 @@ export function Results({ result, image, onRetry }: ResultsProps) {
   const [showAllCoverage, setShowAllCoverage] = useState(false);
   const { analysis, miracleBalm, complexion } = result;
 
-  // Split MB recs into primary and alternates
-  const primaryMB = miracleBalm.filter((r) => r.type === "Primary");
+  // Split MB recs into primary and alternates, with Tint always first
+  const usagePriority = ["All-Over Tint", "Blush", "Bronzer", "Highlighter", "Colorless Glow"];
+  const primaryMB = miracleBalm
+    .filter((r) => r.type === "Primary")
+    .sort((a, b) => {
+      const aIdx = usagePriority.indexOf(a.usage);
+      const bIdx = usagePriority.indexOf(b.usage);
+      return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx);
+    });
   const altMB = miracleBalm.filter((r) => r.type === "Alt");
 
   const confidenceColor = {
