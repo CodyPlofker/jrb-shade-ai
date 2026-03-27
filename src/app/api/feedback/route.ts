@@ -1,12 +1,18 @@
 import { NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
+let _redis: Redis | null = null;
+function getRedis() {
+  if (!_redis) {
+    _redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL!,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    });
+  }
+  return _redis;
+}
 
-const FEEDBACK_KEY = "shade-feedback";
+const FEEDBACK_KEY = "shade-feedback-entries";
 
 export interface FeedbackEntry {
   id: string;
@@ -27,7 +33,6 @@ export interface FeedbackEntry {
   ethnicity: string;
   notes: string;
   hasImage: boolean;
-  imageData?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -53,24 +58,26 @@ export async function POST(request: NextRequest) {
       ethnicity: body.ethnicity || "",
       notes: body.notes || "",
       hasImage: !!body.imageData,
-      imageData: body.imageData || undefined,
     };
 
-    // Save to Redis — each entry stored as a hash member keyed by ID
-    await redis.hset(FEEDBACK_KEY, { [entry.id]: JSON.stringify(entry) });
+    // Save entry to Redis list (push to front)
+    await getRedis().lpush(FEEDBACK_KEY, entry);
+
+    // If there's an image, store it separately keyed by ID
+    if (body.imageData) {
+      await getRedis().set(`shade-feedback-image:${entry.id}`, body.imageData);
+    }
 
     // Also log to Vercel function logs as backup
-    const logEntry = { ...entry };
-    delete logEntry.imageData; // Don't log base64 to console
     console.log("=== SHADE FEEDBACK ===");
-    console.log(JSON.stringify(logEntry, null, 2));
+    console.log(JSON.stringify(entry, null, 2));
     console.log("=== END ===");
 
     return Response.json({ success: true, id: entry.id }, { status: 201 });
   } catch (error) {
     console.error("Feedback save error:", error);
     return Response.json(
-      { error: "Failed to save feedback" },
+      { error: "Failed to save feedback", detail: String(error) },
       { status: 500 }
     );
   }
@@ -78,34 +85,17 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const allData = await redis.hgetall(FEEDBACK_KEY);
-
-    if (!allData || Object.keys(allData).length === 0) {
-      return Response.json({ count: 0, feedback: [] });
-    }
-
-    const entries: FeedbackEntry[] = Object.values(allData).map((v) => {
-      if (typeof v === "string") return JSON.parse(v);
-      return v as FeedbackEntry;
-    });
-
-    // Sort newest first
-    entries.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-
-    // Strip image data from list view to keep response small
-    const cleaned = entries.map((e) => {
-      const { imageData, ...rest } = e;
-      return rest;
-    });
+    // Get all entries from the list
+    const entries = await getRedis().lrange<FeedbackEntry>(FEEDBACK_KEY, 0, -1);
 
     return Response.json({
-      count: cleaned.length,
-      feedback: cleaned,
+      count: entries.length,
+      feedback: entries,
     });
   } catch (error) {
     console.error("Feedback read error:", error);
     return Response.json(
-      { error: "Failed to read feedback" },
+      { error: "Failed to read feedback", detail: String(error) },
       { status: 500 }
     );
   }
