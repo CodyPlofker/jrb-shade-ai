@@ -34,9 +34,6 @@ export function CameraCapture({ onCapture, error }: CameraCaptureProps) {
         },
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
       setMode("camera");
     } catch {
       setCameraError(
@@ -44,6 +41,16 @@ export function CameraCapture({ onCapture, error }: CameraCaptureProps) {
       );
     }
   }, []);
+
+  // Attach stream to video element after it mounts
+  useEffect(() => {
+    if (mode === "camera" && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(() => {
+        // autoplay may be blocked, but autoPlay attr should handle it
+      });
+    }
+  }, [mode]);
 
   useEffect(() => {
     return () => stopCamera();
