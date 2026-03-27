@@ -1,19 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { CameraCapture } from "@/components/CameraCapture";
+import { AnalyzingState } from "@/components/AnalyzingState";
+import { shadeSwatches } from "@/lib/shade-data";
 
-const SKIN_TONES = [
-  "Pale",
-  "Fair",
-  "Light",
-  "Light-Medium",
-  "Medium",
-  "Medium-Dark",
-  "Dark",
-  "Deep",
-];
-
-const UNDERTONES = ["Cool", "Warm", "Neutral"];
+interface AIResult {
+  analysis: {
+    skinTone: string;
+    undertone: string;
+    confidence: string;
+    reasoning: string;
+  };
+  miracleBalm: Array<{
+    skinTone: string;
+    usage: string;
+    type: string;
+    shade: string;
+    copy: string;
+  }>;
+  complexion: {
+    hero: {
+      heroProduct: string;
+      neutralizer: string;
+      coverage: string;
+    } | null;
+    allOptions: Array<{
+      coverage: string;
+      heroProduct: string;
+      neutralizer: string;
+    }>;
+    shades?: {
+      wtfShade: string;
+      facePencilFace: string;
+      facePencilEye: string;
+      neutralizer: string;
+      tintedPowder: string;
+    };
+    needsNeutralizer: boolean;
+  };
+}
 
 const SKIN_TONE_OPTIONS = [
   "Yes",
@@ -29,15 +55,17 @@ const UNDERTONE_OPTIONS = [
   "Should be Neutral",
 ];
 
+type Step = "photo" | "analyzing" | "review" | "submitted";
+
 export default function FeedbackPage() {
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [step, setStep] = useState<Step>("photo");
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [aiResult, setAiResult] = useState<AIResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
-    skinToneDetected: "Light-Medium",
-    undertoneDetected: "Warm",
     skinToneCorrect: "",
     undertoneCorrect: "",
     actualWtfShade: "",
@@ -51,23 +79,91 @@ export default function FeedbackPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
+  const handleCapture = useCallback(async (imageData: string) => {
+    setCapturedImage(imageData);
+    setStep("analyzing");
+    setError(null);
+
+    try {
+      const res = await fetch("/api/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: imageData }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to analyze image");
+      }
+
+      const data: AIResult = await res.json();
+      setAiResult(data);
+      setStep("review");
+    } catch {
+      setError("Failed to analyze your photo. Please try again.");
+      setStep("photo");
+    }
+  }, []);
+
+  // Resize image to thumbnail for storage
+  function resizeImage(dataUrl: string, maxSize: number): Promise<string> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const scale = Math.min(maxSize / img.width, maxSize / img.height);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", 0.7));
+        } else {
+          resolve(dataUrl);
+        }
+      };
+      img.src = dataUrl;
+    });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
 
     try {
+      // Resize image to ~200px thumbnail for storage
+      const thumbnail = capturedImage
+        ? await resizeImage(capturedImage, 200)
+        : null;
+
+      const payload = {
+        ...form,
+        skinToneDetected: aiResult?.analysis.skinTone || "",
+        undertoneDetected: aiResult?.analysis.undertone || "",
+        confidence: aiResult?.analysis.confidence || "",
+        reasoning: aiResult?.analysis.reasoning || "",
+        recommendedMBShades: aiResult?.miracleBalm
+          .filter((r) => r.type === "Primary")
+          .map((r) => `${r.usage}: ${r.shade}`)
+          .join(", ") || "",
+        recommendedWtfShade: aiResult?.complexion.shades?.wtfShade || "",
+        recommendedFacePencil: aiResult?.complexion.shades
+          ? `Face: ${aiResult.complexion.shades.facePencilFace}, Eye: ${aiResult.complexion.shades.facePencilEye}`
+          : "",
+        imageData: thumbnail,
+      };
+
       const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
         throw new Error("Failed to submit feedback");
       }
 
-      setSubmitted(true);
+      setStep("submitted");
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -75,55 +171,11 @@ export default function FeedbackPage() {
     }
   }
 
-  if (submitted) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-          <div className="max-w-md w-full text-center">
-            <div
-              className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
-              style={{ background: "var(--jrb-light-gold)" }}
-            >
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="var(--jrb-brown)"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </div>
-            <h2
-              className="text-2xl mb-3"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-            >
-              Thank you, {form.name || "friend"}
-            </h2>
-            <p
-              className="text-sm mb-8"
-              style={{
-                color: "var(--jrb-muted)",
-                fontFamily: "system-ui, sans-serif",
-              }}
-            >
-              Your feedback helps us make the shade matcher smarter for everyone.
-            </p>
-            <a
-              href="/feedback"
-              className="jrb-button jrb-button-secondary"
-              style={{ textDecoration: "none" }}
-            >
-              Submit another
-            </a>
-          </div>
-        </main>
-      </div>
-    );
+  function handleRetake() {
+    setCapturedImage(null);
+    setAiResult(null);
+    setStep("photo");
+    setError(null);
   }
 
   return (
@@ -132,206 +184,364 @@ export default function FeedbackPage() {
 
       <main className="flex-1 flex flex-col items-center px-4 py-8">
         <div className="max-w-lg w-full">
-          {/* Page title */}
-          <div className="text-center mb-8">
-            <h1
-              className="text-3xl mb-2"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-            >
-              Shade Matcher Feedback
-            </h1>
-            <p
-              className="text-sm"
-              style={{
-                color: "var(--jrb-muted)",
-                fontFamily: "system-ui, sans-serif",
-              }}
-            >
-              Tell us how the AI did so we can improve it.
-            </p>
-          </div>
 
-          <form onSubmit={handleSubmit}>
-            {/* Your Name */}
-            <FormSection>
-              <Label htmlFor="name">Your Name</Label>
-              <Input
-                id="name"
-                placeholder="e.g. Sarah"
-                value={form.name}
-                onChange={(v) => update("name", v)}
-                required
-              />
-            </FormSection>
+          {/* STEP 1: Take Photo */}
+          {step === "photo" && (
+            <CameraCapture onCapture={handleCapture} error={error} />
+          )}
 
-            {/* What the AI recommended */}
-            <FormSection>
-              <SectionHeading>What the AI Recommended</SectionHeading>
+          {/* STEP 2: Analyzing */}
+          {step === "analyzing" && (
+            <AnalyzingState image={capturedImage} />
+          )}
+
+          {/* STEP 3: Review Results + Feedback Form */}
+          {step === "review" && aiResult && (
+            <>
+              {/* AI Results Summary */}
+              <div className="text-center mb-6">
+                <h1
+                  className="text-3xl mb-2"
+                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                >
+                  Review Your Match
+                </h1>
+                <p
+                  className="text-sm"
+                  style={{
+                    color: "var(--jrb-muted)",
+                    fontFamily: "system-ui, sans-serif",
+                  }}
+                >
+                  See what the AI recommended, then tell us how it did.
+                </p>
+              </div>
+
+              {/* Profile card with photo */}
+              <div className="flex items-start gap-4 mb-6 p-4 rounded bg-white border border-[var(--jrb-border)]">
+                {capturedImage && (
+                  <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border border-[var(--jrb-border)]">
+                    <img
+                      src={capturedImage}
+                      alt="Your photo"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span
+                      className="text-sm font-semibold uppercase tracking-wider text-[var(--jrb-brown)]"
+                      style={{ fontFamily: "system-ui, sans-serif" }}
+                    >
+                      {aiResult.analysis.skinTone}
+                    </span>
+                    <span className="text-[var(--jrb-muted)]">·</span>
+                    <span
+                      className="text-sm uppercase tracking-wider text-[var(--jrb-muted)]"
+                      style={{ fontFamily: "system-ui, sans-serif" }}
+                    >
+                      {aiResult.analysis.undertone} undertone
+                    </span>
+                  </div>
+                  <p
+                    className="text-sm text-[var(--jrb-brown)] leading-relaxed"
+                    style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}
+                  >
+                    {aiResult.analysis.reasoning}
+                  </p>
+                </div>
+              </div>
+
+              {/* AI Recommended Shades - Miracle Balm */}
+              <div className="mb-6 p-4 rounded border border-[var(--jrb-border)] bg-[#faf8f5]">
+                <p
+                  className="text-[10px] uppercase tracking-wider text-[var(--jrb-gold)] mb-3"
+                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                >
+                  AI Recommended — Miracle Balm
+                </p>
+                <div className="space-y-2">
+                  {aiResult.miracleBalm
+                    .filter((r) => r.type === "Primary")
+                    .map((rec) => (
+                      <div key={rec.usage} className="flex items-center gap-3">
+                        <div
+                          className="w-6 h-6 rounded-full flex-shrink-0 border border-[var(--jrb-border)]"
+                          style={{ backgroundColor: shadeSwatches[rec.shade] || "#ccc" }}
+                        />
+                        <span
+                          className="text-sm text-[var(--jrb-brown)]"
+                          style={{ fontFamily: "system-ui, sans-serif" }}
+                        >
+                          <strong>{rec.shade}</strong>
+                          <span className="text-[var(--jrb-muted)]"> · {rec.usage}</span>
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* AI Recommended Shades - Complexion */}
+              {aiResult.complexion.shades && (
+                <div className="mb-8 p-4 rounded border border-[var(--jrb-border)] bg-[#faf8f5]">
+                  <p
+                    className="text-[10px] uppercase tracking-wider text-[var(--jrb-gold)] mb-3"
+                    style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                  >
+                    AI Recommended — Complexion
+                  </p>
+                  <div className="space-y-2 text-sm" style={{ fontFamily: "system-ui, sans-serif" }}>
+                    <div className="text-[var(--jrb-brown)]">
+                      <strong>JETM / WTF:</strong> {aiResult.complexion.shades.wtfShade}
+                    </div>
+                    <div className="text-[var(--jrb-brown)]">
+                      <strong>Face Pencil:</strong> {aiResult.complexion.shades.facePencilFace} (face) / {aiResult.complexion.shades.facePencilEye} (under eye)
+                    </div>
+                    {aiResult.complexion.shades.neutralizer && (
+                      <div className="text-[var(--jrb-brown)]">
+                        <strong>Neutralizer:</strong> {aiResult.complexion.shades.neutralizer}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Divider */}
+              <div
+                className="mb-8 text-center"
+                style={{ borderTop: "1px solid var(--jrb-border)", paddingTop: "24px" }}
+              >
+                <h2
+                  className="text-xl mb-1"
+                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                >
+                  Now Tell Us How It Did
+                </h2>
+                <p
+                  className="text-sm"
+                  style={{
+                    color: "var(--jrb-muted)",
+                    fontFamily: "system-ui, sans-serif",
+                  }}
+                >
+                  Your feedback helps the AI get smarter.
+                </p>
+              </div>
+
+              {/* Feedback Form */}
+              <form onSubmit={handleSubmit}>
+                {/* Your Name */}
+                <FormSection>
+                  <Label htmlFor="name">Your Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="e.g. Sarah"
+                    value={form.name}
+                    onChange={(v) => update("name", v)}
+                    required
+                  />
+                </FormSection>
+
+                {/* Accuracy */}
+                <FormSection>
+                  <SectionHeading>Accuracy Check</SectionHeading>
+
+                  <div className="mb-5">
+                    <Label>
+                      Was the skin tone correct?{" "}
+                      <span className="normal-case font-normal text-[var(--jrb-muted)]">
+                        (AI said: {aiResult.analysis.skinTone})
+                      </span>
+                    </Label>
+                    <RadioGroup
+                      name="skinToneCorrect"
+                      options={SKIN_TONE_OPTIONS}
+                      value={form.skinToneCorrect}
+                      onChange={(v) => update("skinToneCorrect", v)}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label>
+                      Was the undertone correct?{" "}
+                      <span className="normal-case font-normal text-[var(--jrb-muted)]">
+                        (AI said: {aiResult.analysis.undertone})
+                      </span>
+                    </Label>
+                    <RadioGroup
+                      name="undertoneCorrect"
+                      options={UNDERTONE_OPTIONS}
+                      value={form.undertoneCorrect}
+                      onChange={(v) => update("undertoneCorrect", v)}
+                      required
+                    />
+                  </div>
+                </FormSection>
+
+                {/* Actual shades */}
+                <FormSection>
+                  <SectionHeading>What Shade Do You Actually Wear?</SectionHeading>
+                  <p
+                    className="text-xs mb-4"
+                    style={{
+                      color: "var(--jrb-muted)",
+                      fontFamily: "system-ui, sans-serif",
+                    }}
+                  >
+                    Fill in whichever products you know your shade for.
+                  </p>
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="actualWtfShade">
+                        WTF / Just Enough Tinted Moisturizer shade
+                      </Label>
+                      <Input
+                        id="actualWtfShade"
+                        placeholder={`e.g. "${aiResult.complexion.shades?.wtfShade || "Beige"}" or different`}
+                        value={form.actualWtfShade}
+                        onChange={(v) => update("actualWtfShade", v)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="actualFacePencilShade">
+                        Face Pencil shade
+                      </Label>
+                      <Input
+                        id="actualFacePencilShade"
+                        placeholder='e.g. "08", "13"'
+                        value={form.actualFacePencilShade}
+                        onChange={(v) => update("actualFacePencilShade", v)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="actualMiracleBalmShades">
+                        Miracle Balm shades you use
+                      </Label>
+                      <Input
+                        id="actualMiracleBalmShades"
+                        placeholder='e.g. "Dusty Rose, Sunkissed"'
+                        value={form.actualMiracleBalmShades}
+                        onChange={(v) => update("actualMiracleBalmShades", v)}
+                      />
+                    </div>
+                  </div>
+                </FormSection>
+
+                {/* Demographics */}
+                <FormSection>
+                  <Label htmlFor="ethnicity">
+                    What&apos;s your ethnicity / background?
+                  </Label>
+                  <p
+                    className="text-xs mb-3"
+                    style={{
+                      color: "var(--jrb-muted)",
+                      fontFamily: "system-ui, sans-serif",
+                    }}
+                  >
+                    Optional — helps us identify gaps in training data for specific
+                    demographics.
+                  </p>
+                  <Input
+                    id="ethnicity"
+                    placeholder="Optional"
+                    value={form.ethnicity}
+                    onChange={(v) => update("ethnicity", v)}
+                  />
+                </FormSection>
+
+                {/* Notes */}
+                <FormSection>
+                  <Label htmlFor="notes">Any other notes?</Label>
+                  <Textarea
+                    id="notes"
+                    placeholder="Anything else we should know — lighting conditions, makeup on/off, etc."
+                    value={form.notes}
+                    onChange={(v) => update("notes", v)}
+                  />
+                </FormSection>
+
+                {/* Error */}
+                {error && (
+                  <p
+                    className="text-sm mb-4 text-center"
+                    style={{
+                      color: "#c44",
+                      fontFamily: "system-ui, sans-serif",
+                    }}
+                  >
+                    {error}
+                  </p>
+                )}
+
+                {/* Buttons */}
+                <div className="space-y-3">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="jrb-button jrb-button-primary w-full"
+                    style={{ opacity: submitting ? 0.6 : 1 }}
+                  >
+                    {submitting ? "Submitting..." : "Submit Feedback"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRetake}
+                    className="jrb-button jrb-button-secondary w-full"
+                  >
+                    Retake Photo
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
+
+          {/* STEP 4: Submitted */}
+          {step === "submitted" && (
+            <div className="text-center py-12">
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
+                style={{ background: "var(--jrb-light-gold)" }}
+              >
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--jrb-brown)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <h2
+                className="text-2xl mb-3"
+                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+              >
+                Thank you, {form.name || "friend"}
+              </h2>
               <p
-                className="text-xs mb-4"
+                className="text-sm mb-8"
                 style={{
                   color: "var(--jrb-muted)",
                   fontFamily: "system-ui, sans-serif",
                 }}
               >
-                Select the skin tone and undertone the tool detected for you.
+                Your feedback helps us make the shade matcher smarter for everyone.
               </p>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="skinToneDetected">Skin Tone Detected</Label>
-                  <Select
-                    id="skinToneDetected"
-                    value={form.skinToneDetected}
-                    onChange={(v) => update("skinToneDetected", v)}
-                    options={SKIN_TONES}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="undertoneDetected">Undertone Detected</Label>
-                  <Select
-                    id="undertoneDetected"
-                    value={form.undertoneDetected}
-                    onChange={(v) => update("undertoneDetected", v)}
-                    options={UNDERTONES}
-                  />
-                </div>
-              </div>
-            </FormSection>
-
-            {/* Accuracy */}
-            <FormSection>
-              <SectionHeading>Accuracy Check</SectionHeading>
-
-              <div className="mb-5">
-                <Label>Was the skin tone correct?</Label>
-                <RadioGroup
-                  name="skinToneCorrect"
-                  options={SKIN_TONE_OPTIONS}
-                  value={form.skinToneCorrect}
-                  onChange={(v) => update("skinToneCorrect", v)}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label>Was the undertone correct?</Label>
-                <RadioGroup
-                  name="undertoneCorrect"
-                  options={UNDERTONE_OPTIONS}
-                  value={form.undertoneCorrect}
-                  onChange={(v) => update("undertoneCorrect", v)}
-                  required
-                />
-              </div>
-            </FormSection>
-
-            {/* Actual shades */}
-            <FormSection>
-              <SectionHeading>What Shade Do You Actually Wear?</SectionHeading>
-              <p
-                className="text-xs mb-4"
-                style={{
-                  color: "var(--jrb-muted)",
-                  fontFamily: "system-ui, sans-serif",
-                }}
+              <button
+                onClick={handleRetake}
+                className="jrb-button jrb-button-secondary"
               >
-                Fill in whichever products you know your shade for.
-              </p>
-
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="actualWtfShade">
-                    WTF / Just Enough Tinted Moisturizer shade
-                  </Label>
-                  <Input
-                    id="actualWtfShade"
-                    placeholder='e.g. "Beige", "Medium Honey"'
-                    value={form.actualWtfShade}
-                    onChange={(v) => update("actualWtfShade", v)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="actualFacePencilShade">
-                    Face Pencil shade
-                  </Label>
-                  <Input
-                    id="actualFacePencilShade"
-                    placeholder='e.g. "08", "13"'
-                    value={form.actualFacePencilShade}
-                    onChange={(v) => update("actualFacePencilShade", v)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="actualMiracleBalmShades">
-                    Miracle Balm shades you use
-                  </Label>
-                  <Input
-                    id="actualMiracleBalmShades"
-                    placeholder='e.g. "Dusty Rose, Sunkissed"'
-                    value={form.actualMiracleBalmShades}
-                    onChange={(v) => update("actualMiracleBalmShades", v)}
-                  />
-                </div>
-              </div>
-            </FormSection>
-
-            {/* Demographics */}
-            <FormSection>
-              <Label htmlFor="ethnicity">
-                What&apos;s your ethnicity / background?
-              </Label>
-              <p
-                className="text-xs mb-3"
-                style={{
-                  color: "var(--jrb-muted)",
-                  fontFamily: "system-ui, sans-serif",
-                }}
-              >
-                Optional — helps us identify gaps in training data for specific
-                demographics.
-              </p>
-              <Input
-                id="ethnicity"
-                placeholder="Optional"
-                value={form.ethnicity}
-                onChange={(v) => update("ethnicity", v)}
-              />
-            </FormSection>
-
-            {/* Notes */}
-            <FormSection>
-              <Label htmlFor="notes">Any other notes?</Label>
-              <Textarea
-                id="notes"
-                placeholder="Anything else we should know — lighting conditions, makeup on/off, etc."
-                value={form.notes}
-                onChange={(v) => update("notes", v)}
-              />
-            </FormSection>
-
-            {/* Error */}
-            {error && (
-              <p
-                className="text-sm mb-4 text-center"
-                style={{
-                  color: "#c44",
-                  fontFamily: "system-ui, sans-serif",
-                }}
-              >
-                {error}
-              </p>
-            )}
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="jrb-button jrb-button-primary w-full"
-              style={{ opacity: submitting ? 0.6 : 1 }}
-            >
-              {submitting ? "Submitting..." : "Submit Feedback"}
-            </button>
-          </form>
+                Submit another
+              </button>
+            </div>
+          )}
 
           {/* Back link */}
           <div className="text-center mt-6 mb-8">
@@ -495,43 +705,6 @@ function Input({
         (e.currentTarget.style.borderColor = "var(--jrb-border)")
       }
     />
-  );
-}
-
-function Select({
-  id,
-  value,
-  onChange,
-  options,
-}: {
-  id: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: string[];
-}) {
-  return (
-    <select
-      id={id}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-3 text-sm rounded-sm outline-none appearance-none cursor-pointer"
-      style={{
-        fontFamily: "system-ui, sans-serif",
-        border: "1px solid var(--jrb-border)",
-        background: "#fff",
-        color: "var(--jrb-black)",
-        backgroundImage:
-          "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%238a7e72' stroke-width='1.5'/%3E%3C/svg%3E\")",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "right 12px center",
-      }}
-    >
-      {options.map((opt) => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
   );
 }
 

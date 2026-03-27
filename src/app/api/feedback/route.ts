@@ -8,13 +8,19 @@ export interface FeedbackEntry {
   name: string;
   skinToneDetected: string;
   undertoneDetected: string;
+  confidence: string;
+  reasoning: string;
   skinToneCorrect: string;
   undertoneCorrect: string;
+  recommendedMBShades: string;
+  recommendedWtfShade: string;
+  recommendedFacePencil: string;
   actualWtfShade: string;
   actualFacePencilShade: string;
   actualMiracleBalmShades: string;
   ethnicity: string;
   notes: string;
+  hasImage: boolean;
 }
 
 // Use /tmp for persistence within a single serverless function lifecycle
@@ -44,18 +50,30 @@ export async function POST(request: NextRequest) {
       name: body.name || "",
       skinToneDetected: body.skinToneDetected || "",
       undertoneDetected: body.undertoneDetected || "",
+      confidence: body.confidence || "",
+      reasoning: body.reasoning || "",
       skinToneCorrect: body.skinToneCorrect || "",
       undertoneCorrect: body.undertoneCorrect || "",
+      recommendedMBShades: body.recommendedMBShades || "",
+      recommendedWtfShade: body.recommendedWtfShade || "",
+      recommendedFacePencil: body.recommendedFacePencil || "",
       actualWtfShade: body.actualWtfShade || "",
       actualFacePencilShade: body.actualFacePencilShade || "",
       actualMiracleBalmShades: body.actualMiracleBalmShades || "",
       ethnicity: body.ethnicity || "",
       notes: body.notes || "",
+      hasImage: !!body.imageData,
     };
 
     // Always log to Vercel function logs — this is the permanent record
     console.log("=== SHADE FEEDBACK SUBMISSION ===");
     console.log(JSON.stringify(entry, null, 2));
+    // Log image separately (base64 thumbnail) so we can retrieve it from logs if needed
+    if (body.imageData) {
+      console.log("=== FEEDBACK IMAGE (base64 thumbnail) ===");
+      console.log(body.imageData);
+      console.log("=== END IMAGE ===");
+    }
     console.log("=== END FEEDBACK ===");
 
     // Also save to /tmp file for GET retrieval within same function lifecycle
