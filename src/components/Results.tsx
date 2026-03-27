@@ -234,205 +234,252 @@ export function Results({ result, image, onRetry }: ResultsProps) {
       {/* COMPLEXION SECTION */}
       <div className="section-divider" />
       <h2 className="text-2xl mb-1" style={{ fontWeight: 300 }}>
-        Complexion Products
+        Your Complexion Routine
       </h2>
       <p
         className="text-sm text-[var(--jrb-muted)] mb-5"
         style={{ fontFamily: "system-ui, sans-serif" }}
       >
-        Your {analysis.skinTone.toLowerCase()}, {analysis.undertone.toLowerCase()}{" "}
-        skin matches these products
+        Based on your {analysis.skinTone.toLowerCase()},{" "}
+        {analysis.undertone.toLowerCase()} skin — here&apos;s your full routine
       </p>
 
-      {/* Hero recommendation */}
-      {complexion.hero && (
-        <div className="shade-card mb-4 border-[var(--jrb-gold)]">
-          <p
-            className="text-[10px] uppercase tracking-wider text-[var(--jrb-gold)] mb-2"
-            style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
-          >
-            Recommended for you
-          </p>
-          {(() => {
-            const product =
-              complexionProducts[complexion.hero.heroProduct];
-            if (!product) return null;
-            const shadeLabel = complexion.shades?.wtfShade;
-            return (
-              <div>
+      <div className="space-y-3 mb-6">
+        {/* Step 1: Base */}
+        {complexion.shades && (
+          <div className="shade-card">
+            <div className="flex items-start gap-3">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs text-white"
+                style={{ background: "var(--jrb-brown)", fontFamily: "system-ui, sans-serif", fontWeight: 700 }}
+              >
+                1
+              </div>
+              <div className="flex-1 min-w-0">
                 <p
-                  className="text-lg font-medium text-[var(--jrb-brown)] mb-1"
+                  className="text-[10px] uppercase tracking-wider text-[var(--jrb-muted)] mb-1"
+                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                >
+                  Base — sheer to light-medium coverage
+                </p>
+                <p
+                  className="text-base font-medium text-[var(--jrb-brown)] mb-0.5"
                   style={{ fontFamily: "system-ui, sans-serif" }}
                 >
-                  {product.name}
+                  Just Enough Tinted Moisturizer or What The Foundation
                 </p>
-                {shadeLabel && (
-                  <p
-                    className="text-sm font-semibold text-[var(--jrb-brown)] mb-2"
-                    style={{ fontFamily: "system-ui, sans-serif" }}
-                  >
-                    Shade: {shadeLabel}
-                  </p>
-                )}
                 <p
-                  className="text-sm text-[var(--jrb-muted)] mb-3 leading-relaxed"
+                  className="text-base font-semibold text-[var(--jrb-brown)] mb-2"
+                  style={{ fontFamily: "system-ui, sans-serif" }}
+                >
+                  Shade: {complexion.shades.wtfShade}
+                </p>
+                <p
+                  className="text-sm text-[var(--jrb-muted)] leading-relaxed mb-3"
                   style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}
                 >
-                  {product.description}
+                  JETM for a lighter, dewier finish. WTF for more coverage and hydration.
+                  Both in the same shade — pick based on how much coverage you want.
                 </p>
-                <a
-                  href={product.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="jrb-button jrb-button-primary w-full text-center"
-                >
-                  Shop {product.name.split(" ").slice(-2).join(" ")}
-                </a>
-              </div>
-            );
-          })()}
-        </div>
-      )}
-
-      {/* Coverage options toggle */}
-      <button
-        onClick={() => setShowAllCoverage(!showAllCoverage)}
-        className="text-sm text-[var(--jrb-brown)] mb-4 flex items-center gap-1"
-        style={{ fontFamily: "system-ui, sans-serif", fontWeight: 500 }}
-      >
-        <span
-          className="transform transition-transform"
-          style={{
-            display: "inline-block",
-            transform: showAllCoverage ? "rotate(90deg)" : "rotate(0deg)",
-          }}
-        >
-          ›
-        </span>
-        {showAllCoverage ? "Hide" : "See all"} coverage options
-      </button>
-
-      {showAllCoverage && (
-        <div className="space-y-3 mb-6">
-          {complexion.allOptions.map((opt) => {
-            const product = complexionProducts[opt.heroProduct];
-            if (!product) return null;
-            return (
-              <div
-                key={opt.coverage}
-                className="flex items-center justify-between p-3 rounded border border-[var(--jrb-border)]"
-              >
-                <div>
-                  <p
-                    className="text-[10px] uppercase tracking-wider text-[var(--jrb-muted)] mb-0.5"
+                <div className="flex gap-2">
+                  <a
+                    href="https://jonesroadbeauty.com/products/just-enough-tinted-moisturizer"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] uppercase tracking-wider text-[var(--jrb-brown)] border-b border-[var(--jrb-brown)] pb-0.5 hover:text-[var(--jrb-gold)] hover:border-[var(--jrb-gold)] transition-colors"
                     style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
                   >
-                    {opt.coverage} coverage
-                  </p>
-                  <p
-                    className="text-sm font-medium text-[var(--jrb-brown)]"
-                    style={{ fontFamily: "system-ui, sans-serif" }}
+                    Shop JETM
+                  </a>
+                  <span className="text-[var(--jrb-muted)]">·</span>
+                  <a
+                    href="https://jonesroadbeauty.com/products/what-the-foundation"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] uppercase tracking-wider text-[var(--jrb-brown)] border-b border-[var(--jrb-brown)] pb-0.5 hover:text-[var(--jrb-gold)] hover:border-[var(--jrb-gold)] transition-colors"
+                    style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
                   >
-                    {product.name}
-                  </p>
+                    Shop WTF
+                  </a>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Face Pencil */}
+        {complexion.shades && (
+          <div className="shade-card">
+            <div className="flex items-start gap-3">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs text-white"
+                style={{ background: "var(--jrb-brown)", fontFamily: "system-ui, sans-serif", fontWeight: 700 }}
+              >
+                2
+              </div>
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-[10px] uppercase tracking-wider text-[var(--jrb-muted)] mb-1"
+                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                >
+                  Conceal — targeted coverage
+                </p>
+                <p
+                  className="text-base font-medium text-[var(--jrb-brown)] mb-0.5"
+                  style={{ fontFamily: "system-ui, sans-serif" }}
+                >
+                  The Face Pencil
+                </p>
+                <div className="flex gap-4 mb-2">
+                  <div>
+                    <p
+                      className="text-[10px] uppercase tracking-wider text-[var(--jrb-muted)]"
+                      style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                    >
+                      Face
+                    </p>
+                    <p
+                      className="text-base font-semibold text-[var(--jrb-brown)]"
+                      style={{ fontFamily: "system-ui, sans-serif" }}
+                    >
+                      Shade {complexion.shades.facePencilFace}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      className="text-[10px] uppercase tracking-wider text-[var(--jrb-muted)]"
+                      style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                    >
+                      Under Eye
+                    </p>
+                    <p
+                      className="text-base font-semibold text-[var(--jrb-brown)]"
+                      style={{ fontFamily: "system-ui, sans-serif" }}
+                    >
+                      Shade {complexion.shades.facePencilEye}
+                    </p>
+                  </div>
+                </div>
+                <p
+                  className="text-sm text-[var(--jrb-muted)] leading-relaxed mb-3"
+                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}
+                >
+                  Use the face shade for redness, spots, and blemishes. The lighter
+                  under-eye shade brightens dark circles.
+                </p>
                 <a
-                  href={product.url}
+                  href="https://jonesroadbeauty.com/products/the-face-pencil"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="jrb-button jrb-button-secondary text-[10px] px-4 h-8"
+                  className="text-[10px] uppercase tracking-wider text-[var(--jrb-brown)] border-b border-[var(--jrb-brown)] pb-0.5 hover:text-[var(--jrb-gold)] hover:border-[var(--jrb-gold)] transition-colors"
+                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
                 >
-                  Shop
+                  Shop The Face Pencil
                 </a>
               </div>
-            );
-          })}
-        </div>
-      )}
+            </div>
+          </div>
+        )}
 
-      {/* Neutralizer recommendation */}
-      {complexion.needsNeutralizer && (
-        <div className="p-4 rounded bg-[#f5f0ea] mb-6">
-          <p
-            className="text-[10px] uppercase tracking-wider text-[var(--jrb-muted)] mb-2"
-            style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
-          >
-            Recommended add-on
-          </p>
-          <p
-            className="text-sm font-medium text-[var(--jrb-brown)] mb-1"
-            style={{ fontFamily: "system-ui, sans-serif" }}
-          >
-            The Neutralizer
-          </p>
-          {complexion.shades?.neutralizer && (
-            <p
-              className="text-sm font-semibold text-[var(--jrb-brown)] mb-2"
-              style={{ fontFamily: "system-ui, sans-serif" }}
-            >
-              Shade: {complexion.shades.neutralizer}
-            </p>
-          )}
-          <p
-            className="text-sm text-[var(--jrb-muted)] mb-3"
-            style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}
-          >
-            With {analysis.undertone.toLowerCase()} undertones, a color-correcting
-            neutralizer can help even out redness before your foundation.
-          </p>
-          <a
-            href="https://jonesroadbeauty.com/products/the-neutralizer"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] uppercase tracking-wider text-[var(--jrb-brown)] border-b border-[var(--jrb-brown)] pb-0.5 hover:text-[var(--jrb-gold)] hover:border-[var(--jrb-gold)] transition-colors"
-            style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
-          >
-            Shop The Neutralizer
-          </a>
-        </div>
-      )}
+        {/* Step 3: Neutralizer (if needed) */}
+        {complexion.needsNeutralizer && complexion.shades?.neutralizer && (
+          <div className="shade-card" style={{ background: "#f5f0ea", borderColor: "transparent" }}>
+            <div className="flex items-start gap-3">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs text-white"
+                style={{ background: "var(--jrb-gold)", fontFamily: "system-ui, sans-serif", fontWeight: 700 }}
+              >
+                +
+              </div>
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-[10px] uppercase tracking-wider text-[var(--jrb-gold)] mb-1"
+                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                >
+                  Color correct — use before face pencil
+                </p>
+                <p
+                  className="text-base font-medium text-[var(--jrb-brown)] mb-0.5"
+                  style={{ fontFamily: "system-ui, sans-serif" }}
+                >
+                  The Neutralizer Pencil
+                </p>
+                <p
+                  className="text-base font-semibold text-[var(--jrb-brown)] mb-2"
+                  style={{ fontFamily: "system-ui, sans-serif" }}
+                >
+                  Shade: {complexion.shades.neutralizer}
+                </p>
+                <p
+                  className="text-sm text-[var(--jrb-muted)] leading-relaxed mb-3"
+                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}
+                >
+                  Apply under your Face Pencil on dark circles and discoloration.
+                  The peachy tone cancels blue and purple undertones.
+                </p>
+                <a
+                  href="https://jonesroadbeauty.com/products/the-neutralizer-pencil"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] uppercase tracking-wider text-[var(--jrb-brown)] border-b border-[var(--jrb-brown)] pb-0.5 hover:text-[var(--jrb-gold)] hover:border-[var(--jrb-gold)] transition-colors"
+                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                >
+                  Shop Neutralizer Pencil
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
 
-      {/* Face Pencil */}
-      {complexionProducts["Face Pencil"] && (
-        <div className="p-4 rounded bg-white border border-[var(--jrb-border)] mb-6">
-          <p
-            className="text-[10px] uppercase tracking-wider text-[var(--jrb-muted)] mb-2"
-            style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
-          >
-            For targeted coverage
-          </p>
-          <p
-            className="text-sm font-medium text-[var(--jrb-brown)] mb-1"
-            style={{ fontFamily: "system-ui, sans-serif" }}
-          >
-            The Face Pencil
-          </p>
-          {complexion.shades && (
-            <p
-              className="text-sm font-semibold text-[var(--jrb-brown)] mb-2"
-              style={{ fontFamily: "system-ui, sans-serif" }}
-            >
-              Shade {complexion.shades.facePencilFace} (face) / Shade{" "}
-              {complexion.shades.facePencilEye} (under eye)
-            </p>
-          )}
-          <p
-            className="text-sm text-[var(--jrb-muted)] mb-3"
-            style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}
-          >
-            {complexionProducts["Face Pencil"].description}
-          </p>
-          <a
-            href={complexionProducts["Face Pencil"].url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] uppercase tracking-wider text-[var(--jrb-brown)] border-b border-[var(--jrb-brown)] pb-0.5 hover:text-[var(--jrb-gold)] hover:border-[var(--jrb-gold)] transition-colors"
-            style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
-          >
-            Shop The Face Pencil
-          </a>
-        </div>
-      )}
+        {/* Step 3/4: Tinted Face Powder */}
+        {complexion.shades && (
+          <div className="shade-card">
+            <div className="flex items-start gap-3">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs text-white"
+                style={{ background: "var(--jrb-brown)", fontFamily: "system-ui, sans-serif", fontWeight: 700 }}
+              >
+                3
+              </div>
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-[10px] uppercase tracking-wider text-[var(--jrb-muted)] mb-1"
+                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                >
+                  Set — optional finishing step
+                </p>
+                <p
+                  className="text-base font-medium text-[var(--jrb-brown)] mb-0.5"
+                  style={{ fontFamily: "system-ui, sans-serif" }}
+                >
+                  Tinted Face Powder
+                </p>
+                <p
+                  className="text-base font-semibold text-[var(--jrb-brown)] mb-2"
+                  style={{ fontFamily: "system-ui, sans-serif" }}
+                >
+                  Shade: {complexion.shades.tintedPowder}
+                </p>
+                <p
+                  className="text-sm text-[var(--jrb-muted)] leading-relaxed mb-3"
+                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}
+                >
+                  Sets your base, controls shine, and extends wear. Light dusting on the T-zone is all you need.
+                </p>
+                <a
+                  href="https://jonesroadbeauty.com/products/tinted-face-powder"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] uppercase tracking-wider text-[var(--jrb-brown)] border-b border-[var(--jrb-brown)] pb-0.5 hover:text-[var(--jrb-gold)] hover:border-[var(--jrb-gold)] transition-colors"
+                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                >
+                  Shop Face Powder
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Retry button */}
       <div className="section-divider" />
