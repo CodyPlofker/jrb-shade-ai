@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShadeResult } from "@/app/page";
+import { ShadeResult } from "@/lib/types";
 import {
   shadeSwatches,
   miracleBalmUrls,
