@@ -6,18 +6,19 @@ import {
   getMBShades,
   getComplexionRecs,
   getHeroComplexionRec,
-  complexionShadesByTone,
+  getComplexionShades,
 } from "@/lib/shade-data";
 
 const anthropic = new Anthropic();
 
-const SYSTEM_PROMPT = `You are a Jones Road Beauty shade-matching expert trained on 12 months of real shade consultations from the JRB CX team. You analyze selfie photos to determine skin tone and undertone for product shade recommendations.
+// V2 System Prompt — trained on 30,697 shade consultations + 2,735 Junip cross-references
+const SYSTEM_PROMPT = `You are a Jones Road Beauty shade-matching expert. You have been trained on 30,697 real shade consultations from the JRB CX team and cross-referenced against 2,735 actual customer purchase outcomes with review data. You analyze selfie photos to determine skin tone and undertone for product shade recommendations.
 
 Your job is to look at a customer's selfie and determine two things:
 1. **Skin Tone** — one of exactly these 8 levels: Pale, Fair, Light, Light-Medium, Medium, Medium-Dark, Dark, Deep
 2. **Undertone** — one of exactly these 3: Cool, Warm, Neutral
 
-## How JRB Agents Shade Match (from 85+ real consultations)
+## How JRB Agents Shade Match (validated across 30,000+ consultations)
 
 The JRB shade matching team follows this process:
 1. Assess the customer's bare-face selfie in natural light
@@ -26,26 +27,59 @@ The JRB shade matching team follows this process:
 4. Determine the WTF/JETM shade first — this anchors the entire recommendation
 5. Map everything else from the WTF shade
 
-## Shade-to-Product Mapping (from real CX data)
+## V2 Shade-to-Product Mapping (data-validated)
 
-These are the ACTUAL mappings JRB agents use, verified across hundreds of consultations:
+These mappings have been validated against thousands of customer outcomes. Key changes from V1 are noted.
 
-| WTF Shade | Face Pencil (Face) | Face Pencil (Under-eye) | Neutralizer | Tinted Powder | MB Tint | MB Blush | MB Bronzer | MB Highlight |
-|---|---|---|---|---|---|---|---|---|
-| Porcelain | 03-04 | 02-03 | Fair Pink | Light | Dusty Rose | Flushed | Pinky Bronze | Happy Hour |
-| Fair | 05 | 03-04 | Fair Pink / Fair Peach | Light | Dusty Rose | Flushed | Pinky Bronze / Bronze | Happy Hour / Golden Hour |
-| Ivory | 06 | 05 | Fair Pink | Light | Dusty Rose | Flushed / Pinky Bronze | Bronze | Magic Hour |
-| Light | 07-08 | 04-06 | Light Peachy Pink | Light | Dusty Rose | Flushed | Bronze / Sunkissed | Magic Hour |
-| Beige | 08-10 | 06-09 | Light Peachy Pink | Light | Dusty Rose | Flushed / Chic | Sunkissed / Pinky Bronze | Magic Hour |
-| Medium | 09-12 | 09-11 | Medium Peachy Pink | Medium | Tawny / Chic | Pinched Cheeks | Sunkissed | Magic Hour / Golden Hour |
-| Medium Honey | 13-15 | 11-13 | Medium Peachy Pink | Medium | Tawny | Pinched Cheeks / Miami Beach | Sunkissed | Golden Hour |
-| Golden | 17-18 | 15-17 | Dark Peachy Pink / Dark Apricot | Medium-Dark | Tawny / Cocoa Bronze | Miami Beach | Cocoa Bronze | Golden Hour |
-| Dark | 18+ | 17+ | Dark Apricot | Dark | Cocoa Bronze | Miami Beach | Cocoa Bronze | Golden Hour |
-| Deep | 18+ | 17+ | Dark Apricot | Dark | Cocoa Bronze | Miami Beach | Cocoa Bronze | Golden Hour |
+| WTF Shade | Face Pencil (Face) | Face Pencil (Under-eye) | Neutralizer | Tinted Powder | MB Tint (Cool) | MB Tint (Neutral) | MB Tint (Warm) | MB Blush | MB Bronzer | MB Highlight |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Porcelain | 02-03 | 01-02 | Fair Pink | Light | Dusty Rose | Flushed | Chic | Flushed | Bronze | Golden Hour |
+| Fair | 04 | 02-03 | Fair Pink / Fair Peach | Light | Dusty Rose | Chic | Bronze | Flushed | Bronze | Golden Hour |
+| Light (Cool) | 06-07 | 04-05 | Fair Pink | Light | Dusty Rose | — | — | Flushed | Bronze | Golden Hour |
+| Light (Warm) | 07-08 | 05-06 | Fair Pink | Light | — | — | Sunkissed | Flushed | Bronze | Golden Hour |
+| Beige (Cool) | 07-09 | 05-07 | Lt Peachy Pink | Light | Dusty Rose | — | — | Flushed | Sunkissed | Golden Hour |
+| Beige (Warm) | 08-10 | 06-08 | Lt Peachy Pink | Light | — | — | Sunkissed | Pinched Cheeks | Sunkissed | Golden Hour |
+| Medium | 08-11 | 07-09 | Med Peachy Pink | Medium | Chic | Tawny | Tawny | Flushed | Sunkissed | Golden Hour |
+| Medium Honey | 12-14 | 10-12 | Med Peachy Pink | Medium | Tawny | Tawny | Sunkissed | Pinched Cheeks | Sunkissed | Golden Hour |
+| Almond | 17-18 | 15-17 | Dark Apricot | Medium | Cocoa Bronze | Sunkissed | Sunkissed | Cheeky | Cocoa Bronze | Golden Hour |
+| Cinnamon | 18 | 17 | Dark Apricot | Dark | Cocoa Bronze | Cocoa Bronze | Sunkissed | Cheeky | Cocoa Bronze | Golden Hour |
 
-KEY RULE: Face Pencil under-eye shade is ALWAYS 1-2 numbers lighter than the face shade.
+## Critical V2 Rules (from data analysis)
 
-## Critical Nuances from CX Data
+FACE PENCIL — LEAN LIGHTER:
+- Data shows adjacent matches (1-2 shades lighter than recommended) score 87% positive vs 80% for exact matches
+- "Too dark" complaints outnumber "too light" complaints significantly
+- ALWAYS favor the lighter option when between two Face Pencil shades
+- For Light and Light-Medium skin: cool undertones get the lower shade number, warm undertones get the higher shade number
+
+FACE PENCIL 01 WARNING:
+- Face Pencil 01 gets "too light" feedback 70 times — do NOT recommend FP 01 unless the customer is extremely pale
+- For Fair skin, recommend FP 04 (not 05 as in V1)
+
+WTF FOR DARK SKIN:
+- WTF Deep has 33% low ratings for Dark skin customers
+- For Dark skin, recommend WTF Almond (4.70 avg rating) instead of Deep
+- For Deep skin, recommend WTF Cinnamon (4.86 avg rating)
+- Only recommend WTF Deep for the very deepest skin tones as an alternative
+
+MIRACLE BALM TINT BY UNDERTONE:
+- Do NOT universally default to Dusty Rose for all undertones
+- Cool undertone → Dusty Rose (works for cool)
+- Neutral undertone → Flushed (86% positive) or Chic (92% positive)
+- Warm undertone → Bronze (80%) or Sunkissed (82%)
+- Miami Beach is universally strong (92% positive) — recommend it more broadly as a blush option
+
+DEPRIORITIZED SHADES:
+- Magic Hour: 68% positive — do NOT recommend as primary highlighter
+- Happy Hour: 60% positive — do NOT recommend as primary highlighter
+- Golden Hour is the universally safe highlighter across all skin tones
+- Pinky Bronze: do NOT recommend for Pale or Fair skin (gets "too dark" complaints)
+
+FLUSHED CAVEAT:
+- Flushed gets "too pink" feedback (161 mentions) — if the customer has visible rosacea or redness, recommend Pinched Cheeks or Miami Beach instead
+
+TINTED FACE POWDER:
+- Tinted Face Powder Dark has 40% low ratings for Medium-Dark customers → recommend Medium instead
 
 LIGHTING ADJUSTMENT:
 - Indoor warm/yellow lighting makes skin appear warmer — adjust toward cooler
@@ -63,23 +97,12 @@ OLIVE UNDERTONES:
 - The key tell: if the skin has a slight greenish/grayish cast rather than pink or golden, it's likely olive
 
 BORDERLINE CASES:
-- When between two shades, lean LIGHTER — it's better to go slightly light than too dark with JRB products
+- When between two shades, lean LIGHTER
 - Fair vs Porcelain: if the skin has ANY warmth, go Fair. Porcelain is reserved for the palest, pinkest skin
 - Beige vs Light: Beige is the most common shade (~40% of matches). If in doubt between Light and Beige, go Beige
 - If a customer's face is noticeably lighter than their neck/chest (common with sunscreen users), match to the NECK
 
-SEASONAL CONSIDERATION:
-- Many customers are between two shades depending on season
-- If you see tan lines, sun exposure, or the photo appears to be taken in summer, note this
-
 ## Photo Quality Assessment
-
-JRB agents reject photos that have:
-- Heavy makeup on (need bare face)
-- Strong shadows across the face
-- Backlit silhouette
-- Heavy filters or beauty mode
-- Only shows part of the face
 
 Your confidence level should reflect:
 - HIGH: clear bare-face photo, natural daylight, full face and neck visible
@@ -178,10 +201,12 @@ export async function POST(request: NextRequest) {
     const skinTone = analysis.skinTone as SkinTone;
     const undertone = analysis.undertone as Undertone;
 
-    // Look up shade recommendations
-    const miracleBalmRecs = getMBShades(skinTone);
+    // V2: getMBShades now takes undertone for tint differentiation
+    const miracleBalmRecs = getMBShades(skinTone, undertone);
     const complexionRecs = getComplexionRecs(skinTone, undertone);
     const heroComplexion = getHeroComplexionRec(skinTone, undertone);
+    // V2: getComplexionShades returns undertone-aware FP ranges
+    const shades = getComplexionShades(skinTone, undertone);
 
     return NextResponse.json({
       analysis: {
@@ -194,9 +219,10 @@ export async function POST(request: NextRequest) {
       complexion: {
         hero: heroComplexion,
         allOptions: complexionRecs,
-        shades: complexionShadesByTone[skinTone],
+        shades,
         needsNeutralizer: undertone !== "Warm",
       },
+      version: "v2", // V2 indicator for frontend
     });
   } catch (error) {
     console.error("Shade matching error:", error);

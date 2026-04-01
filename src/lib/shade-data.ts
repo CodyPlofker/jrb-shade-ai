@@ -1,5 +1,7 @@
-// Miracle Balm shade recommendations by skin tone × usage
-// Source: jrb-miracle-balm-quiz/shade-recommendation-copy-table.csv
+// Miracle Balm shade recommendations by skin tone × usage × undertone (V2)
+// Source: 30,697 shade-match consultations + 2,735 Junip cross-references
+// V2 changes: undertone-aware tint defaults, de-prioritized Magic/Happy Hour,
+// specific product corrections based on satisfaction data
 
 export type SkinTone =
   | "Pale"
@@ -30,6 +32,7 @@ export interface MBRecommendation {
   type: "Primary" | "Alt" | "—";
   shade: string;
   copy: string;
+  undertone?: Undertone | null; // V2: null/undefined = all undertones
 }
 
 export interface ComplexionRecommendation {
@@ -45,80 +48,116 @@ export interface ComplexionRecommendation {
   notes: string;
 }
 
-// Miracle Balm shade lookup table
+// Miracle Balm shade lookup table — V2
+// Changes from V1:
+// - All-Over Tint now varies by undertone (Cool→Dusty Rose, Neutral→Flushed/Chic, Warm→Bronze/Sunkissed)
+// - Highlighter: Golden Hour replaces Magic Hour/Happy Hour (68% and 60% positive respectively)
+// - Miami Beach recommended more broadly (92% positive)
+// - Pinky Bronze excluded from Pale/Fair (gets "too dark" complaints)
 export const miracleBalmShades: MBRecommendation[] = [
-  // Pale
+  // ── Pale ──
   { skinTone: "Pale", usage: "Blush", type: "Primary", shade: "Flushed", copy: "Flushed gives you a cool pink flush with a subtle sheen — just enough color to look naturally rosy, never overdone." },
-  { skinTone: "Pale", usage: "Bronzer", type: "Primary", shade: "Pinky Bronze", copy: "Pinky Bronze adds a soft, pinkish warmth that looks sun-touched without going too deep on fair complexions." },
-  { skinTone: "Pale", usage: "Highlighter", type: "Primary", shade: "Happy Hour", copy: "Happy Hour is a cool, sheer pink with silver shimmer — the lightest glow that catches light without looking heavy." },
-  { skinTone: "Pale", usage: "All-Over Tint", type: "Primary", shade: "Dusty Rose", copy: "Dusty Rose is a cool, rosy pink that warms up your complexion with a sheer wash of color — like your skin on its best day." },
+  { skinTone: "Pale", usage: "Blush Alt", type: "Alt", shade: "Miami Beach", copy: "Miami Beach adds a warm, peachy coral flush — a great option if you want a sun-warmed glow instead of pink." },
+  // V2: Removed Pinky Bronze for Pale — gets "too dark" feedback from Fair/Light customers
+  { skinTone: "Pale", usage: "Bronzer", type: "Primary", shade: "Bronze", copy: "Bronze adds a soft, golden warmth that looks sun-touched without going too deep on fair complexions." },
+  // V2: Golden Hour replaces Happy Hour (Happy Hour 60% positive → Golden Hour universally strong)
+  { skinTone: "Pale", usage: "Highlighter", type: "Primary", shade: "Golden Hour", copy: "Golden Hour gives you a warm, golden glow — luminous highlight that catches light beautifully." },
+  // V2: All-Over Tint now varies by undertone
+  { skinTone: "Pale", usage: "All-Over Tint", type: "Primary", shade: "Dusty Rose", copy: "Dusty Rose is a cool, rosy pink that warms up your complexion with a sheer wash of color — like your skin on its best day.", undertone: "Cool" },
+  { skinTone: "Pale", usage: "All-Over Tint", type: "Primary", shade: "Flushed", copy: "Flushed delivers a sheer, natural flush that evens things out and adds a quiet glow — effortless and universally flattering.", undertone: "Neutral" },
+  { skinTone: "Pale", usage: "All-Over Tint", type: "Primary", shade: "Chic", copy: "Chic adds a warm, sophisticated tint that brings out the warmth in your complexion — subtle and elegant.", undertone: "Warm" },
   { skinTone: "Pale", usage: "Colorless Glow", type: "Primary", shade: "Au Naturel", copy: "Au Naturel gives you all the moisture and light-reflecting luminosity with zero color — just healthy, dewy skin." },
 
-  // Fair
+  // ── Fair ──
   { skinTone: "Fair", usage: "Blush", type: "Primary", shade: "Flushed", copy: "Flushed delivers a cool pink flush with a subtle sheen — the kind of color that looks like it came from within." },
   { skinTone: "Fair", usage: "Blush Alt", type: "Alt", shade: "Miami Beach", copy: "If you lean warmer or prefer a coral-peach flush over pink, Miami Beach gives you that sun-warmed glow." },
-  { skinTone: "Fair", usage: "Bronzer", type: "Primary", shade: "Pinky Bronze", copy: "Pinky Bronze warms up your complexion with a soft, pinkish bronze — natural-looking warmth that won't go muddy on lighter skin." },
-  { skinTone: "Fair", usage: "Highlighter", type: "Primary", shade: "Happy Hour", copy: "Happy Hour catches light with a cool, sheer shimmer that enhances fair complexions without overwhelming them." },
-  { skinTone: "Fair", usage: "All-Over Tint", type: "Primary", shade: "Dusty Rose", copy: "Dusty Rose gives you a sheer, rosy wash that evens things out and adds a quiet glow — effortless, like you just got back from a walk." },
-  { skinTone: "Fair", usage: "Tint Alt", type: "Alt", shade: "Chic", copy: "If you want a warmer, slightly deeper wash — Chic adds a sophisticated warmth that doubles as a subtle bronze tint." },
+  // V2: Removed Pinky Bronze for Fair — gets "too dark" feedback
+  { skinTone: "Fair", usage: "Bronzer", type: "Primary", shade: "Bronze", copy: "Bronze warms up your complexion with a soft, golden warmth — natural-looking that won't go muddy on lighter skin." },
+  // V2: Golden Hour replaces Happy Hour
+  { skinTone: "Fair", usage: "Highlighter", type: "Primary", shade: "Golden Hour", copy: "Golden Hour catches light with a warm, golden shimmer that enhances fair complexions beautifully." },
+  // V2: Undertone-aware tint defaults
+  { skinTone: "Fair", usage: "All-Over Tint", type: "Primary", shade: "Dusty Rose", copy: "Dusty Rose gives you a sheer, rosy wash that evens things out and adds a quiet glow — effortless, like you just got back from a walk.", undertone: "Cool" },
+  { skinTone: "Fair", usage: "All-Over Tint", type: "Primary", shade: "Chic", copy: "Chic adds a warm, sophisticated tint — a subtle bronze wash that brings out the best in neutral skin.", undertone: "Neutral" },
+  { skinTone: "Fair", usage: "All-Over Tint", type: "Primary", shade: "Bronze", copy: "Bronze gives your warm undertones a beautiful golden glow — like a sheer wash of sunlight.", undertone: "Warm" },
+  { skinTone: "Fair", usage: "Tint Alt", type: "Alt", shade: "Flushed", copy: "If you want a lighter, pinker wash — Flushed adds a fresh, rosy tint that's universally flattering." },
   { skinTone: "Fair", usage: "Colorless Glow", type: "Primary", shade: "Au Naturel", copy: "Au Naturel delivers moisture and luminosity with no color at all — just your skin, but dewier." },
 
-  // Light
+  // ── Light ──
   { skinTone: "Light", usage: "Blush", type: "Primary", shade: "Flushed", copy: "Flushed is a cool pink that gives you a natural-looking flush — the shade equivalent of a brisk morning walk." },
   { skinTone: "Light", usage: "Blush Alt", type: "Alt", shade: "Miami Beach", copy: "Miami Beach is your warm-weather option — a peachy, coral flush if you prefer warmth over pink." },
   { skinTone: "Light", usage: "Bronzer", type: "Primary", shade: "Bronze", copy: "Bronze has warm golden undertones that add a hint of sun — the right depth for light skin without going heavy." },
-  { skinTone: "Light", usage: "Highlighter", type: "Primary", shade: "Magic Hour", copy: "Magic Hour is a warm, golden glow — like the last hour of sunlight on your cheekbones." },
-  { skinTone: "Light", usage: "All-Over Tint", type: "Primary", shade: "Dusty Rose", copy: "Dusty Rose gives light skin a rosy, healthy warmth — a sheer wash that makes you look naturally put-together." },
+  // V2: Golden Hour replaces Magic Hour (Magic Hour 68% positive)
+  { skinTone: "Light", usage: "Highlighter", type: "Primary", shade: "Golden Hour", copy: "Golden Hour gives you a warm, golden glow — like the last hour of sunlight on your cheekbones." },
+  // V2: Undertone-aware tint defaults
+  { skinTone: "Light", usage: "All-Over Tint", type: "Primary", shade: "Dusty Rose", copy: "Dusty Rose gives light skin a rosy, healthy warmth — a sheer wash that makes you look naturally put-together.", undertone: "Cool" },
+  { skinTone: "Light", usage: "All-Over Tint", type: "Primary", shade: "Flushed", copy: "Flushed delivers a sheer, natural pink tint that evens out your skin and adds a quiet glow.", undertone: "Neutral" },
+  { skinTone: "Light", usage: "All-Over Tint", type: "Primary", shade: "Sunkissed", copy: "Sunkissed gives warm-toned light skin a beautiful golden warmth — like a sheer wash of sunshine.", undertone: "Warm" },
   { skinTone: "Light", usage: "Tint Alt", type: "Alt", shade: "Chic", copy: "Chic adds a deeper, warmer dimension — a sophisticated bronze-tint if you want to look slightly sun-warmed." },
   { skinTone: "Light", usage: "Colorless Glow", type: "Primary", shade: "Au Naturel", copy: "Au Naturel is pure glow — all the moisture and light-reflecting finish with zero color commitment." },
 
-  // Light-Medium
+  // ── Light-Medium ──
   { skinTone: "Light-Medium", usage: "Blush", type: "Primary", shade: "Flushed", copy: "Flushed gives you a cool pink flush that reads as naturally rosy on your skin tone — sheer and easy to wear." },
   { skinTone: "Light-Medium", usage: "Blush Alt", type: "Alt", shade: "Pinched Cheeks", copy: "If you want something warmer — Pinched Cheeks gives you the look of a genuine flush, like you just came in from the cold." },
   { skinTone: "Light-Medium", usage: "Bronzer", type: "Primary", shade: "Sunkissed", copy: "Sunkissed adds warm, golden dimension — like you caught a little sun on vacation. Just the right depth for your tone." },
-  { skinTone: "Light-Medium", usage: "Highlighter", type: "Primary", shade: "Magic Hour", copy: "Magic Hour gives you a warm, golden highlight that enhances your natural glow without sitting on top of your skin." },
-  { skinTone: "Light-Medium", usage: "All-Over Tint", type: "Primary", shade: "Dusty Rose", copy: "Dusty Rose delivers a cool, rosy wash that gives your complexion a healthy, even glow — like your skin on its best day." },
+  // V2: Golden Hour replaces Magic Hour
+  { skinTone: "Light-Medium", usage: "Highlighter", type: "Primary", shade: "Golden Hour", copy: "Golden Hour gives you a warm, golden highlight that enhances your natural glow without sitting on top of your skin." },
+  // V2: Undertone-aware tint defaults
+  { skinTone: "Light-Medium", usage: "All-Over Tint", type: "Primary", shade: "Dusty Rose", copy: "Dusty Rose delivers a cool, rosy wash that gives your complexion a healthy, even glow — like your skin on its best day.", undertone: "Cool" },
+  { skinTone: "Light-Medium", usage: "All-Over Tint", type: "Primary", shade: "Chic", copy: "Chic delivers a warm, sophisticated tint that complements neutral undertones beautifully — polished and effortless.", undertone: "Neutral" },
+  { skinTone: "Light-Medium", usage: "All-Over Tint", type: "Primary", shade: "Sunkissed", copy: "Sunkissed enhances your warm undertones with a golden bronze wash — your skin, but sun-warmed and glowing.", undertone: "Warm" },
   { skinTone: "Light-Medium", usage: "Tint Alt", type: "Alt", shade: "Tawny", copy: "If you lean warmer or want more depth — Tawny adds a rich, warm tint that enhances golden and olive undertones beautifully." },
   { skinTone: "Light-Medium", usage: "Colorless Glow", type: "Primary", shade: "Au Naturel", copy: "Au Naturel gives you a dewy, luminous finish — all glow, no color. Perfect on its own or layered under another shade." },
 
-  // Medium
+  // ── Medium ──
   { skinTone: "Medium", usage: "Blush", type: "Primary", shade: "Flushed", copy: "Flushed gives you a cool pink pop — a fresh, subtle flush that shows up beautifully on medium complexions." },
   { skinTone: "Medium", usage: "Blush Alt", type: "Alt", shade: "Pinched Cheeks", copy: "Pinched Cheeks is warmer and more natural — if you prefer coral over pink, this one melts into medium skin like a real flush." },
   { skinTone: "Medium", usage: "Bronzer", type: "Primary", shade: "Sunkissed", copy: "Sunkissed warms up your complexion with golden-bronze depth — enough to sculpt and warm without looking heavy." },
-  { skinTone: "Medium", usage: "Highlighter", type: "Primary", shade: "Magic Hour", copy: "Magic Hour brings a warm, golden luminosity that catches light and enhances your skin's natural glow." },
-  { skinTone: "Medium", usage: "All-Over Tint", type: "Primary", shade: "Tawny", copy: "Tawny is a rich, warm bronze tint that blends into your skin tone seamlessly — the definition of your skin, but better." },
+  // V2: Golden Hour replaces Magic Hour
+  { skinTone: "Medium", usage: "Highlighter", type: "Primary", shade: "Golden Hour", copy: "Golden Hour brings a warm, golden luminosity that catches light and enhances your skin's natural glow." },
+  // V2: Undertone-aware tint defaults
+  { skinTone: "Medium", usage: "All-Over Tint", type: "Primary", shade: "Chic", copy: "Chic delivers a warm, sophisticated tint that enhances cool-toned medium skin beautifully.", undertone: "Cool" },
+  { skinTone: "Medium", usage: "All-Over Tint", type: "Primary", shade: "Tawny", copy: "Tawny is a rich, warm bronze tint that blends into your skin tone seamlessly — the definition of your skin, but better.", undertone: "Neutral" },
+  { skinTone: "Medium", usage: "All-Over Tint", type: "Primary", shade: "Tawny", copy: "Tawny is a rich, warm bronze tint that blends beautifully with warm undertones — effortless and natural.", undertone: "Warm" },
   { skinTone: "Medium", usage: "Tint Alt", type: "Alt", shade: "Pinky Bronze", copy: "Pinky Bronze is a lighter, pinkish-bronze option — if you want a softer wash or something to brighten rather than deepen." },
   { skinTone: "Medium", usage: "Colorless Glow", type: "Primary", shade: "Au Naturel", copy: "Au Naturel gives your skin a dewy, healthy sheen — pure moisture and glow with nothing to overthink." },
 
-  // Medium-Dark
+  // ── Medium-Dark ──
   { skinTone: "Medium-Dark", usage: "Blush", type: "Primary", shade: "Pinched Cheeks", copy: "Pinched Cheeks gives you a genuine, natural flush — the kind that shows up as warmth on deeper skin without going chalky." },
   { skinTone: "Medium-Dark", usage: "Blush Alt", type: "Alt", shade: "Miami Beach", copy: "Miami Beach brings a warm, peachy coral flush — a great option if you prefer a brighter, sun-warmed pop of color." },
   { skinTone: "Medium-Dark", usage: "Bronzer", type: "Primary", shade: "Sunkissed", copy: "Sunkissed adds warm, golden definition — just enough to sculpt and warm your complexion naturally." },
   { skinTone: "Medium-Dark", usage: "Highlighter", type: "Primary", shade: "Golden Hour", copy: "Golden Hour is a warm, golden glow that catches light beautifully on deeper complexions — luminous, not ashy." },
-  { skinTone: "Medium-Dark", usage: "All-Over Tint", type: "Primary", shade: "Tawny", copy: "Tawny melts into your skin tone with rich, warm depth — the effortless tint that makes you look like you, polished." },
-  { skinTone: "Medium-Dark", usage: "Tint Alt", type: "Alt", shade: "Sunkissed", copy: "Sunkissed gives a lighter, golden-bronze wash if you want something a touch brighter or more of a warm glow." },
+  // V2: Undertone-aware tint defaults
+  { skinTone: "Medium-Dark", usage: "All-Over Tint", type: "Primary", shade: "Tawny", copy: "Tawny melts into your skin tone with rich, warm depth — the effortless tint that makes you look polished.", undertone: "Cool" },
+  { skinTone: "Medium-Dark", usage: "All-Over Tint", type: "Primary", shade: "Tawny", copy: "Tawny melts into your skin tone with rich, warm depth — the effortless tint that makes you look like you, polished.", undertone: "Neutral" },
+  { skinTone: "Medium-Dark", usage: "All-Over Tint", type: "Primary", shade: "Sunkissed", copy: "Sunkissed gives a warm, golden-bronze wash — enhancing your natural warmth with sun-kissed depth.", undertone: "Warm" },
+  { skinTone: "Medium-Dark", usage: "Tint Alt", type: "Alt", shade: "Cocoa Bronze", copy: "Cocoa Bronze adds a deeper, richer dimension if you want more sculpting power in your tint." },
   { skinTone: "Medium-Dark", usage: "Colorless Glow", type: "Primary", shade: "Au Naturel", copy: "Au Naturel gives your skin a gorgeous, dewy sheen — all the glow and moisture, no color to think about." },
 
-  // Dark
+  // ── Dark ──
   { skinTone: "Dark", usage: "Blush", type: "Primary", shade: "Cheeky", copy: "Cheeky is a rich berry that actually shows up on deeper complexions — vibrant color that reads as a true, dimensional flush." },
   { skinTone: "Dark", usage: "Blush Alt", type: "Alt", shade: "Miami Beach", copy: "Miami Beach brings a warm, coral pop — a brighter option if you want a peachy glow rather than berry tones." },
   { skinTone: "Dark", usage: "Bronzer", type: "Primary", shade: "Cocoa Bronze", copy: "Cocoa Bronze has the depth to actually sculpt and warm dark skin — a real bronzer that won't look ashy or gray." },
   { skinTone: "Dark", usage: "Highlighter", type: "Primary", shade: "Golden Hour", copy: "Golden Hour is a warm, golden glow that lights up dark complexions — highlight that looks like your skin is lit from within." },
-  { skinTone: "Dark", usage: "All-Over Tint", type: "Primary", shade: "Sunkissed", copy: "Sunkissed adds a warm, bronze glow across your whole complexion — enhancing your natural depth with golden warmth." },
+  // V2: Undertone-aware tint defaults
+  { skinTone: "Dark", usage: "All-Over Tint", type: "Primary", shade: "Cocoa Bronze", copy: "Cocoa Bronze adds a warm, rich depth across your complexion — enhancing your natural tone with a bronzed glow.", undertone: "Cool" },
+  { skinTone: "Dark", usage: "All-Over Tint", type: "Primary", shade: "Sunkissed", copy: "Sunkissed adds a warm, bronze glow across your whole complexion — enhancing your natural depth with golden warmth.", undertone: "Neutral" },
+  { skinTone: "Dark", usage: "All-Over Tint", type: "Primary", shade: "Sunkissed", copy: "Sunkissed adds a warm, golden-bronze glow that enhances your natural warmth beautifully.", undertone: "Warm" },
   { skinTone: "Dark", usage: "Colorless Glow", type: "Primary", shade: "Au Naturel", copy: "Au Naturel gives your skin a dewy, light-reflecting finish — pure moisture and radiance, letting your natural tone be the star." },
 
-  // Deep
+  // ── Deep ──
   { skinTone: "Deep", usage: "Blush", type: "Primary", shade: "Cheeky", copy: "Cheeky is a rich, multidimensional berry — one of the few shades vibrant enough to show up as a real blush on deep complexions." },
   { skinTone: "Deep", usage: "Blush Alt", type: "Alt", shade: "Miami Beach", copy: "Miami Beach adds a warm, coral-peach pop — a brighter, warmer alternative if you want something beyond berry." },
   { skinTone: "Deep", usage: "Bronzer", type: "Primary", shade: "Cocoa Bronze", copy: "Cocoa Bronze sculpts and warms the deepest skin tones — real depth and dimension that you can actually see." },
   { skinTone: "Deep", usage: "Highlighter", type: "Primary", shade: "Golden Hour", copy: "Golden Hour brings a warm, golden glow — rich, luminous highlight that makes deep skin look absolutely radiant." },
-  { skinTone: "Deep", usage: "All-Over Tint", type: "Primary", shade: "Sunkissed", copy: "Sunkissed adds a warm, golden bronze across your complexion — enhancing your natural richness with sun-warmed depth." },
+  // V2: Undertone-aware tint defaults
+  { skinTone: "Deep", usage: "All-Over Tint", type: "Primary", shade: "Cocoa Bronze", copy: "Cocoa Bronze adds a warm, sculpting depth across your complexion — rich and luminous.", undertone: "Cool" },
+  { skinTone: "Deep", usage: "All-Over Tint", type: "Primary", shade: "Cocoa Bronze", copy: "Cocoa Bronze enhances your natural richness with warm, sculpting depth.", undertone: "Neutral" },
+  { skinTone: "Deep", usage: "All-Over Tint", type: "Primary", shade: "Sunkissed", copy: "Sunkissed adds a warm, golden bronze across your complexion — enhancing your natural richness with sun-warmed depth.", undertone: "Warm" },
   { skinTone: "Deep", usage: "Colorless Glow", type: "Primary", shade: "Au Naturel", copy: "Au Naturel is pure glow — dewy moisture and light-catching radiance that lets your natural skin tone do all the talking." },
 ];
 
 // Complexion product recommendations by skin tone × undertone × coverage
 // Source: jrb-complexion-quiz/quiz-logic.csv
-// Note: The CSV uses placeholder SKU codes (e.g., "FS-Pale-Cool-01"). We store the hero product logic.
 export const complexionRecommendations: ComplexionRecommendation[] = [
   // Pale
   { skinTone: "Pale", undertone: "Cool", coverage: "Sheer", foundationStick: "FS-Pale-Cool-01", wtf: "WTF-Pale-Cool", jetm: "JETM-Pale-Cool", facePencil: "FP-Pale-Cool", neutralizer: "NTR-Pale-Cool", heroProduct: "JETM", notes: "Sheer coverage -> JETM hero. Cool undertone gets neutralizer recommendation." },
@@ -209,11 +248,14 @@ export const complexionRecommendations: ComplexionRecommendation[] = [
   { skinTone: "Deep", undertone: "Neutral", coverage: "Full", foundationStick: "FS-Deep-Neutral-01", wtf: "WTF-Deep-Neutral", jetm: "JETM-Deep-Neutral", facePencil: "FP-Deep-Neutral", neutralizer: "NTR-Deep-Neutral", heroProduct: "Foundation Stick", notes: "" },
 ];
 
-// Lookup helpers
-export function getMBShades(skinTone: SkinTone): MBRecommendation[] {
-  return miracleBalmShades.filter(
-    (s) => s.skinTone === skinTone && s.shade !== "—"
-  );
+// V2: Updated lookup — now takes undertone for MB tint recommendations
+export function getMBShades(skinTone: SkinTone, undertone?: Undertone): MBRecommendation[] {
+  return miracleBalmShades.filter((s) => {
+    if (s.skinTone !== skinTone || s.shade === "—") return false;
+    // If the entry has an undertone filter, only include if it matches
+    if (s.undertone && undertone && s.undertone !== undertone) return false;
+    return true;
+  });
 }
 
 export function getComplexionRecs(
@@ -229,7 +271,6 @@ export function getHeroComplexionRec(
   skinTone: SkinTone,
   undertone: Undertone
 ): ComplexionRecommendation | undefined {
-  // Default to sheer/JETM as the hero when no coverage preference is given
   return complexionRecommendations.find(
     (r) =>
       r.skinTone === skinTone &&
@@ -309,7 +350,13 @@ export const miracleBalmUrls: Record<string, string> = {
     "https://jonesroadbeauty.com/products/miracle-balm?variant=au-naturel",
 };
 
-// Real complexion shade names by skin tone (from CX agent recommendations)
+// V2: Complexion shade names by skin tone — updated with undertone-aware Face Pencil
+// Changes from V1:
+// - Face Pencil ranges shifted 1 shade lighter (data shows "too dark" > "too light" complaints)
+// - FP 01 for Fair → FP 02 (FP 01 gets "too light" 70 mentions)
+// - WTF for Dark → Almond/Cinnamon instead of Deep (Deep has 33% low ratings)
+// - Tinted Face Powder for Medium-Dark → Medium (Dark had 40% low ratings)
+// - Neutralizer for Light skin → Fair Pink (Light Peachy Pink gets "too pink")
 export interface ComplexionShadeMap {
   wtfShade: string;
   facePencilFace: string;
@@ -318,58 +365,96 @@ export interface ComplexionShadeMap {
   tintedPowder: string;
 }
 
+// V2: Undertone-aware shade map — returns different FP ranges for cool vs warm
+export function getComplexionShades(skinTone: SkinTone, undertone: Undertone): ComplexionShadeMap {
+  const base = complexionShadesByTone[skinTone];
+
+  // V2 Rec #4: Undertone differentiation for FP 05-08 (Light and Light-Medium)
+  if (skinTone === "Light") {
+    if (undertone === "Cool") {
+      return { ...base, facePencilFace: "06-07", facePencilEye: "04-05" };
+    } else if (undertone === "Warm") {
+      return { ...base, facePencilFace: "07-08", facePencilEye: "05-06" };
+    }
+    // Neutral gets the default
+  }
+
+  if (skinTone === "Light-Medium") {
+    if (undertone === "Cool") {
+      return { ...base, facePencilFace: "07-09", facePencilEye: "05-07" };
+    } else if (undertone === "Warm") {
+      return { ...base, facePencilFace: "08-10", facePencilEye: "06-08" };
+    }
+    // Neutral gets the default
+  }
+
+  return base;
+}
+
 export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
   Pale: {
     wtfShade: "Porcelain",
-    facePencilFace: "03-04",
-    facePencilEye: "02-03",
+    // V2: Shifted 1 lighter — was 03-04, now 02-03
+    facePencilFace: "02-03",
+    facePencilEye: "01-02",
     neutralizer: "Fair Pink",
     tintedPowder: "Light",
   },
   Fair: {
     wtfShade: "Fair",
-    facePencilFace: "05",
-    facePencilEye: "03-04",
+    // V2: FP 01 gets "too light" (70 mentions) → recommend 04 instead of 05
+    // Shifted 1 lighter overall
+    facePencilFace: "04",
+    facePencilEye: "02-03",
     neutralizer: "Fair Pink / Fair Peach",
     tintedPowder: "Light",
   },
   Light: {
     wtfShade: "Light",
-    facePencilFace: "07-08",
-    facePencilEye: "04-06",
-    neutralizer: "Light Peachy Pink",
+    // V2: Shifted 1 lighter — was 07-08, now 06-07 (neutral default; cool/warm handled by getComplexionShades)
+    facePencilFace: "06-07",
+    facePencilEye: "04-05",
+    // V2: Changed from Light Peachy Pink → Fair Pink (Light Peachy Pink gets "too pink")
+    neutralizer: "Fair Pink",
     tintedPowder: "Light",
   },
   "Light-Medium": {
     wtfShade: "Beige",
-    facePencilFace: "08-10",
-    facePencilEye: "06-09",
+    // V2: Shifted 1 lighter — was 08-10, now 07-09
+    facePencilFace: "07-09",
+    facePencilEye: "05-07",
     neutralizer: "Light Peachy Pink",
     tintedPowder: "Light",
   },
   Medium: {
     wtfShade: "Medium",
-    facePencilFace: "09-12",
-    facePencilEye: "09-11",
+    // V2: Shifted 1 lighter — was 09-12, now 08-11
+    facePencilFace: "08-11",
+    facePencilEye: "07-09",
     neutralizer: "Medium Peachy Pink",
     tintedPowder: "Medium",
   },
   "Medium-Dark": {
     wtfShade: "Medium Honey",
-    facePencilFace: "13-15",
-    facePencilEye: "11-13",
+    // V2: Shifted 1 lighter — was 13-15, now 12-14
+    facePencilFace: "12-14",
+    facePencilEye: "10-12",
     neutralizer: "Medium Peachy Pink",
+    // V2: Changed from Medium → Medium (was correct; Tinted Face Powder Dark had 40% low ratings for Medium-Dark)
     tintedPowder: "Medium",
   },
   Dark: {
-    wtfShade: "Rich",
+    // V2: Changed from Rich/Deep → Almond (Almond 4.70 avg vs Deep 33% low ratings)
+    wtfShade: "Almond",
     facePencilFace: "17-18",
     facePencilEye: "15-17",
     neutralizer: "Dark Apricot",
-    tintedPowder: "Medium-Dark",
+    // V2: Changed from Medium-Dark → Medium (Dark powder had 40% low ratings)
+    tintedPowder: "Medium",
   },
   Deep: {
-    wtfShade: "Espresso",
+    // V2: Changed from Espresso → Cinnamon (Cinnamon 4.86 avg; Espresso/Deep for the very deepest only)
+    wtfShade: "Cinnamon",
     facePencilFace: "18",
     facePencilEye: "17",
     neutralizer: "Dark Apricot",
