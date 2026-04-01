@@ -481,11 +481,19 @@ export function Results({ result, image, onRetry }: ResultsProps) {
         )}
       </div>
 
-      {/* Retry button */}
+      {/* Action buttons */}
       <div className="section-divider" />
-      <button onClick={onRetry} className="jrb-button jrb-button-secondary w-full">
-        Try Again With a New Photo
-      </button>
+      <div className="space-y-3">
+        <a
+          href="/feedback"
+          className="jrb-button w-full block text-center"
+        >
+          Give Feedback on Your Match
+        </a>
+        <button onClick={onRetry} className="jrb-button jrb-button-secondary w-full">
+          Try Again With a New Photo
+        </button>
+      </div>
     </div>
   );
 }

@@ -151,6 +151,7 @@ export default function FeedbackPage() {
           ? `Face: ${aiResult.complexion.shades.facePencilFace}, Eye: ${aiResult.complexion.shades.facePencilEye}`
           : "",
         imageData: thumbnail,
+        version: "v2",
       };
 
       const res = await fetch("/api/feedback", {
@@ -566,7 +567,7 @@ export default function FeedbackPage() {
 
 function Header() {
   return (
-    <header className="flex items-center justify-center py-5 px-4 border-b border-[var(--jrb-border)]">
+    <header className="flex items-center justify-center py-5 px-4 border-b border-[var(--jrb-border)] relative">
       <a href="/">
         <svg
           width="160"
@@ -621,6 +622,7 @@ function Header() {
           </defs>
         </svg>
       </a>
+      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-mono tracking-wider text-[var(--jrb-muted)] bg-[#f0f0f0] px-2 py-0.5 rounded">V2 TEST</span>
     </header>
   );
 }

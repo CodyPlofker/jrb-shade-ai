@@ -93,7 +93,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-center py-5 px-4 border-b border-[var(--jrb-border)]">
+      <header className="flex items-center justify-center py-5 px-4 border-b border-[var(--jrb-border)] relative">
         <a href="https://jonesroadbeauty.com">
           <svg width="160" height="15" viewBox="0 0 256 22" fill="none" xmlns="http://www.w3.org/2000/svg">
             <title>Jones Road</title>
@@ -115,6 +115,7 @@ export default function Home() {
             </defs>
           </svg>
         </a>
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-mono tracking-wider text-[var(--jrb-muted)] bg-[#f0f0f0] px-2 py-0.5 rounded">V2 TEST</span>
       </header>
 
       {/* Main content */}
