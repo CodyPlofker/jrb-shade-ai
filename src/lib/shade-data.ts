@@ -310,6 +310,7 @@ export const miracleBalmUrls: Record<string, string> = {
 };
 
 // Real complexion shade names by skin tone (from CX agent recommendations)
+// V3 LEGACY — kept for backwards compatibility with old responses
 export interface ComplexionShadeMap {
   wtfShade: string;
   facePencilFace: string;
@@ -374,6 +375,110 @@ export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
     facePencilEye: "17",
     neutralizer: "Dark Apricot",
     tintedPowder: "Dark",
+  },
+};
+
+// V4 — WTF-shade-anchored product lookup
+// The AI now picks the WTF shade directly; all products derive from it.
+// Face Pencil ranges recalibrated using V3 feedback data.
+export type WtfShade =
+  | "Porcelain"
+  | "Alabaster"
+  | "Fair"
+  | "Ivory"
+  | "Light"
+  | "Beige"
+  | "Medium"
+  | "Medium Honey"
+  | "Golden"
+  | "Dark"
+  | "Deep";
+
+export interface WtfShadeProducts {
+  facePencilFace: string;
+  facePencilEye: string;
+  neutralizer: string;
+  tintedPowder: string;
+  skinTone: SkinTone; // maps back for Miracle Balm lookup
+}
+
+export const wtfShadeProductMap: Record<WtfShade, WtfShadeProducts> = {
+  Porcelain: {
+    facePencilFace: "01-02",
+    facePencilEye: "01",
+    neutralizer: "Fair Pink",
+    tintedPowder: "Light",
+    skinTone: "Pale",
+  },
+  Alabaster: {
+    facePencilFace: "02-03",
+    facePencilEye: "01-02",
+    neutralizer: "Fair Pink",
+    tintedPowder: "Light",
+    skinTone: "Pale",
+  },
+  Fair: {
+    facePencilFace: "04-05",
+    facePencilEye: "02-03",
+    neutralizer: "Fair Pink / Fair Peach",
+    tintedPowder: "Light",
+    skinTone: "Fair",
+  },
+  Ivory: {
+    facePencilFace: "05-06",
+    facePencilEye: "03-04",
+    neutralizer: "Fair Pink",
+    tintedPowder: "Light",
+    skinTone: "Light",
+  },
+  Light: {
+    facePencilFace: "06-07",
+    facePencilEye: "04-05",
+    neutralizer: "Light Peachy Pink",
+    tintedPowder: "Light",
+    skinTone: "Light",
+  },
+  Beige: {
+    facePencilFace: "07-09",
+    facePencilEye: "05-07",
+    neutralizer: "Light Peachy Pink",
+    tintedPowder: "Light",
+    skinTone: "Light-Medium",
+  },
+  Medium: {
+    facePencilFace: "09-12",
+    facePencilEye: "09-11",
+    neutralizer: "Medium Peachy Pink",
+    tintedPowder: "Medium",
+    skinTone: "Medium",
+  },
+  "Medium Honey": {
+    facePencilFace: "13-15",
+    facePencilEye: "11-13",
+    neutralizer: "Medium Peachy Pink",
+    tintedPowder: "Medium",
+    skinTone: "Medium-Dark",
+  },
+  Golden: {
+    facePencilFace: "17-18",
+    facePencilEye: "15-17",
+    neutralizer: "Dark Peachy Pink / Dark Apricot",
+    tintedPowder: "Medium-Dark",
+    skinTone: "Medium-Dark",
+  },
+  Dark: {
+    facePencilFace: "18+",
+    facePencilEye: "17+",
+    neutralizer: "Dark Apricot",
+    tintedPowder: "Dark",
+    skinTone: "Dark",
+  },
+  Deep: {
+    facePencilFace: "18+",
+    facePencilEye: "17+",
+    neutralizer: "Dark Apricot",
+    tintedPowder: "Dark",
+    skinTone: "Deep",
   },
 };
 
