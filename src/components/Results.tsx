@@ -245,7 +245,7 @@ export function Results({ result, image, onRetry }: ResultsProps) {
       </p>
 
       <div className="space-y-3 mb-6">
-        {/* Step 1: Base */}
+        {/* Step 1: Base — 3-tier coverage selector */}
         {complexion.shades && (
           <div className="shade-card">
             <div className="flex items-start gap-3">
@@ -257,49 +257,90 @@ export function Results({ result, image, onRetry }: ResultsProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p
-                  className="text-[10px] uppercase tracking-wider text-[var(--jrb-muted)] mb-1"
+                  className="text-[10px] uppercase tracking-wider text-[var(--jrb-muted)] mb-3"
                   style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
                 >
-                  Base — sheer to light-medium coverage
+                  Base — pick your coverage
                 </p>
-                <p
-                  className="text-base font-medium text-[var(--jrb-brown)] mb-0.5"
-                  style={{ fontFamily: "system-ui, sans-serif" }}
-                >
-                  Just Enough Tinted Moisturizer or What The Foundation
-                </p>
-                <p
-                  className="text-base font-semibold text-[var(--jrb-brown)] mb-2"
-                  style={{ fontFamily: "system-ui, sans-serif" }}
-                >
-                  Shade: {complexion.shades.wtfShade}
-                </p>
-                <p
-                  className="text-sm text-[var(--jrb-muted)] leading-relaxed mb-3"
-                  style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}
-                >
-                  JETM for a lighter, dewier finish. WTF for more coverage and hydration.
-                  Both in the same shade — pick based on how much coverage you want.
-                </p>
-                <div className="flex gap-2">
+
+                {/* Sheer tier */}
+                <div className="mb-4 pb-4" style={{ borderBottom: "1px solid var(--jrb-border)" }}>
+                  <p
+                    className="text-[9px] uppercase tracking-wider text-[var(--jrb-muted)] mb-0.5"
+                    style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                  >
+                    Sheer
+                  </p>
+                  <p className="text-base font-medium text-[var(--jrb-brown)] mb-0.5" style={{ fontFamily: "system-ui, sans-serif" }}>
+                    Just Enough Tinted Moisturizer
+                  </p>
+                  <p className="text-sm font-semibold text-[var(--jrb-brown)] mb-1" style={{ fontFamily: "system-ui, sans-serif" }}>
+                    Shade: {complexion.shades.wtfShade}
+                  </p>
+                  <p className="text-xs text-[var(--jrb-muted)] leading-relaxed mb-2" style={{ fontFamily: "system-ui, sans-serif" }}>
+                    Lightest, dewiest finish — lets your skin show through.
+                  </p>
                   <a
                     href="https://jonesroadbeauty.com/products/just-enough-tinted-moisturizer"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target="_blank" rel="noopener noreferrer"
                     className="text-[10px] uppercase tracking-wider text-[var(--jrb-brown)] border-b border-[var(--jrb-brown)] pb-0.5 hover:text-[var(--jrb-gold)] hover:border-[var(--jrb-gold)] transition-colors"
                     style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
                   >
                     Shop JETM
                   </a>
-                  <span className="text-[var(--jrb-muted)]">·</span>
+                </div>
+
+                {/* Light-Medium tier */}
+                <div className="mb-4 pb-4" style={{ borderBottom: "1px solid var(--jrb-border)" }}>
+                  <p
+                    className="text-[9px] uppercase tracking-wider text-[var(--jrb-muted)] mb-0.5"
+                    style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                  >
+                    Light-Medium
+                  </p>
+                  <p className="text-base font-medium text-[var(--jrb-brown)] mb-0.5" style={{ fontFamily: "system-ui, sans-serif" }}>
+                    What The Foundation
+                  </p>
+                  <p className="text-sm font-semibold text-[var(--jrb-brown)] mb-1" style={{ fontFamily: "system-ui, sans-serif" }}>
+                    Shade: {complexion.shades.wtfShade}
+                  </p>
+                  <p className="text-xs text-[var(--jrb-muted)] leading-relaxed mb-2" style={{ fontFamily: "system-ui, sans-serif" }}>
+                    Buildable coverage with a skin-like, moisturizing finish.
+                  </p>
                   <a
                     href="https://jonesroadbeauty.com/products/what-the-foundation"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target="_blank" rel="noopener noreferrer"
                     className="text-[10px] uppercase tracking-wider text-[var(--jrb-brown)] border-b border-[var(--jrb-brown)] pb-0.5 hover:text-[var(--jrb-gold)] hover:border-[var(--jrb-gold)] transition-colors"
                     style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
                   >
                     Shop WTF
+                  </a>
+                </div>
+
+                {/* Full coverage tier — Foundation Stick (V3 new) */}
+                <div>
+                  <p
+                    className="text-[9px] uppercase tracking-wider text-[var(--jrb-muted)] mb-0.5"
+                    style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                  >
+                    Full
+                  </p>
+                  <p className="text-base font-medium text-[var(--jrb-brown)] mb-0.5" style={{ fontFamily: "system-ui, sans-serif" }}>
+                    The Foundation Stick
+                  </p>
+                  <p className="text-sm font-semibold text-[var(--jrb-brown)] mb-1" style={{ fontFamily: "system-ui, sans-serif" }}>
+                    Shade: {complexion.shades.foundationStickShade}
+                  </p>
+                  <p className="text-xs text-[var(--jrb-muted)] leading-relaxed mb-2" style={{ fontFamily: "system-ui, sans-serif" }}>
+                    Full coverage in a portable stick — blend with fingers for a skin-like finish.
+                  </p>
+                  <a
+                    href="https://jonesroadbeauty.com/products/the-foundation-stick"
+                    target="_blank" rel="noopener noreferrer"
+                    className="text-[10px] uppercase tracking-wider text-[var(--jrb-brown)] border-b border-[var(--jrb-brown)] pb-0.5 hover:text-[var(--jrb-gold)] hover:border-[var(--jrb-gold)] transition-colors"
+                    style={{ fontFamily: "system-ui, sans-serif", fontWeight: 600 }}
+                  >
+                    Shop Foundation Stick
                   </a>
                 </div>
               </div>
@@ -481,19 +522,11 @@ export function Results({ result, image, onRetry }: ResultsProps) {
         )}
       </div>
 
-      {/* Action buttons */}
+      {/* Retry button — feedback form is shown inline below Results in page.tsx */}
       <div className="section-divider" />
-      <div className="space-y-3">
-        <a
-          href="/feedback"
-          className="jrb-button w-full block text-center"
-        >
-          Give Feedback on Your Match
-        </a>
-        <button onClick={onRetry} className="jrb-button jrb-button-secondary w-full">
-          Try Again With a New Photo
-        </button>
-      </div>
+      <button onClick={onRetry} className="jrb-button jrb-button-secondary w-full">
+        Try Again With a New Photo
+      </button>
     </div>
   );
 }

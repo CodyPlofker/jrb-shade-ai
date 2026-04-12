@@ -29,6 +29,7 @@ export interface ShadeResult {
       facePencilEye: string;
       neutralizer: string;
       tintedPowder: string;
+      foundationStickShade: string; // V3: undertone-aware Foundation Stick shade
     };
     needsNeutralizer: boolean;
   };

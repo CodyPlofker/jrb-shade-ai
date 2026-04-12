@@ -363,33 +363,54 @@ export interface ComplexionShadeMap {
   facePencilEye: string;
   neutralizer: string;
   tintedPowder: string;
+  foundationStickShade: string; // V3: undertone-aware FS shade (confirmed names from quiz-logic.html)
 }
 
-// V2: Undertone-aware shade map — returns different FP ranges for cool vs warm
+// V2+V3: Undertone-aware shade map — returns different FP ranges for cool vs warm (V2)
+// and undertone-aware Foundation Stick shades (V3)
 export function getComplexionShades(skinTone: SkinTone, undertone: Undertone): ComplexionShadeMap {
   const base = complexionShadesByTone[skinTone];
 
-  // V2 Rec #4: Undertone differentiation for FP 05-08 (Light and Light-Medium)
+  // V3: Always apply undertone-aware Foundation Stick shade
+  const foundationStickShade = foundationStickByTone[skinTone][undertone];
+
+  // V2 Rec #4: Undertone differentiation for FP ranges (Light and Light-Medium)
   if (skinTone === "Light") {
     if (undertone === "Cool") {
-      return { ...base, facePencilFace: "06-07", facePencilEye: "04-05" };
+      return { ...base, facePencilFace: "06-07", facePencilEye: "04-05", foundationStickShade };
     } else if (undertone === "Warm") {
-      return { ...base, facePencilFace: "07-08", facePencilEye: "05-06" };
+      return { ...base, facePencilFace: "07-08", facePencilEye: "05-06", foundationStickShade };
     }
-    // Neutral gets the default
+    // Neutral gets base FP, just update FS
+    return { ...base, foundationStickShade };
   }
 
   if (skinTone === "Light-Medium") {
     if (undertone === "Cool") {
-      return { ...base, facePencilFace: "07-09", facePencilEye: "05-07" };
+      return { ...base, facePencilFace: "07-09", facePencilEye: "05-07", foundationStickShade };
     } else if (undertone === "Warm") {
-      return { ...base, facePencilFace: "08-10", facePencilEye: "06-08" };
+      return { ...base, facePencilFace: "08-10", facePencilEye: "06-08", foundationStickShade };
     }
-    // Neutral gets the default
+    // Neutral gets base FP, just update FS
+    return { ...base, foundationStickShade };
   }
 
-  return base;
+  return { ...base, foundationStickShade };
 }
+
+// V3: Foundation Stick shades — confirmed names from quiz-logic.html (April 2026)
+// Undertone-aware; getComplexionShades() overrides foundationStickShade for Cool/Warm
+// Default stored here = Neutral. Cool and Warm are set in getComplexionShades().
+export const foundationStickByTone: Record<SkinTone, Record<"Cool" | "Warm" | "Neutral", string>> = {
+  "Pale":         { Cool: "Pale Alabaster", Warm: "Bisque",       Neutral: "Alabaster" },
+  "Fair":         { Cool: "Porcelain",      Warm: "Warm Linen",   Neutral: "Neutral Fair" },
+  "Light":        { Cool: "Fair",           Warm: "Sand",         Neutral: "Ivory" },
+  "Light-Medium": { Cool: "Beige",          Warm: "Warm Beige",   Neutral: "Neutral Beige" },
+  "Medium":       { Cool: "Medium",         Warm: "Warm Medium",  Neutral: "Neutral Medium" },
+  "Medium-Dark":  { Cool: "Medium Honey",   Warm: "Warm Honey",   Neutral: "Neutral Honey" },
+  "Dark":         { Cool: "Pecan",          Warm: "Golden",       Neutral: "Hazelnut" },
+  "Deep":         { Cool: "Almond",         Warm: "Almond",       Neutral: "Almond" },
+};
 
 export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
   Pale: {
@@ -399,15 +420,16 @@ export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
     facePencilEye: "01-02",
     neutralizer: "Fair Pink",
     tintedPowder: "Light",
+    foundationStickShade: "Alabaster", // Neutral default; getComplexionShades() overrides for Cool/Warm
   },
   Fair: {
     wtfShade: "Fair",
     // V2: FP 01 gets "too light" (70 mentions) → recommend 04 instead of 05
-    // Shifted 1 lighter overall
     facePencilFace: "04",
     facePencilEye: "02-03",
     neutralizer: "Fair Pink / Fair Peach",
     tintedPowder: "Light",
+    foundationStickShade: "Neutral Fair",
   },
   Light: {
     wtfShade: "Light",
@@ -417,6 +439,7 @@ export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
     // V2: Changed from Light Peachy Pink → Fair Pink (Light Peachy Pink gets "too pink")
     neutralizer: "Fair Pink",
     tintedPowder: "Light",
+    foundationStickShade: "Ivory",
   },
   "Light-Medium": {
     wtfShade: "Beige",
@@ -425,6 +448,7 @@ export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
     facePencilEye: "05-07",
     neutralizer: "Light Peachy Pink",
     tintedPowder: "Light",
+    foundationStickShade: "Neutral Beige",
   },
   Medium: {
     wtfShade: "Medium",
@@ -433,6 +457,7 @@ export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
     facePencilEye: "07-09",
     neutralizer: "Medium Peachy Pink",
     tintedPowder: "Medium",
+    foundationStickShade: "Neutral Medium",
   },
   "Medium-Dark": {
     wtfShade: "Medium Honey",
@@ -440,8 +465,8 @@ export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
     facePencilFace: "12-14",
     facePencilEye: "10-12",
     neutralizer: "Medium Peachy Pink",
-    // V2: Changed from Medium → Medium (was correct; Tinted Face Powder Dark had 40% low ratings for Medium-Dark)
     tintedPowder: "Medium",
+    foundationStickShade: "Neutral Honey",
   },
   Dark: {
     // V2: Changed from Rich/Deep → Almond (Almond 4.70 avg vs Deep 33% low ratings)
@@ -449,8 +474,8 @@ export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
     facePencilFace: "17-18",
     facePencilEye: "15-17",
     neutralizer: "Dark Apricot",
-    // V2: Changed from Medium-Dark → Medium (Dark powder had 40% low ratings)
     tintedPowder: "Medium",
+    foundationStickShade: "Hazelnut",
   },
   Deep: {
     // V2: Changed from Espresso → Cinnamon (Cinnamon 4.86 avg; Espresso/Deep for the very deepest only)
@@ -459,6 +484,7 @@ export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
     facePencilEye: "17",
     neutralizer: "Dark Apricot",
     tintedPowder: "Dark",
+    foundationStickShade: "Almond",
   },
 };
 
