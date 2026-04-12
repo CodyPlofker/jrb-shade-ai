@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V3 Feedback Brief — April 12, 2026</title>
+<style>
+  :root {
+    --brown: #3b2f2f;
+    --gold: #b8860b;
+    --light-gold: #f5f0e8;
+    --muted: #8a7e72;
+    --border: #e5ddd3;
+    --bg: #faf8f5;
+    --red: #c44;
+    --green: #2a7a3a;
+    --amber: #b8860b;
+    --card-bg: #fff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--brown);
+    line-height: 1.5;
+  }
+  header {
+    background: var(--brown);
+    color: #fff;
+    padding: 24px 20px;
+    text-align: center;
+  }
+  header h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
+  header p { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+  .container { max-width: 960px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* Stat cards */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-card .number { font-size: 40px; font-weight: 700; line-height: 1; }
+  .stat-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-top: 6px; }
+  .stat-card .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .stat-red .number { color: var(--red); }
+  .stat-green .number { color: var(--green); }
+  .stat-amber .number { color: var(--amber); }
+
+  /* Sections */
+  .section { margin-bottom: 32px; }
+  .section-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+  /* Bar chart */
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label { width: 120px; font-size: 13px; text-align: right; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 28px; background: #eee8de; border-radius: 4px; position: relative; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 600; color: #fff; min-width: 32px; transition: width 0.6s ease; }
+  .bar-value { width: 44px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+
+  /* Horizontal stacked bar */
+  .stacked-bar { display: flex; height: 36px; border-radius: 6px; overflow: hidden; margin-bottom: 8px; }
+  .stacked-bar .seg { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  /* Table */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .data-table th {
+    background: var(--brown);
+    color: #fff;
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--light-gold); }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .tag-correct { background: #d4edda; color: #155724; }
+  .tag-too-dark { background: #f8d7da; color: #721c24; }
+  .tag-too-light { background: #fff3cd; color: #856404; }
+  .tag-wrong { background: #f8d7da; color: #721c24; }
+
+  /* Issues list */
+  .issue-list { list-style: none; }
+  .issue-list li {
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .issue-list li strong { color: var(--brown); }
+  .issue-priority {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  .priority-high { background: var(--red); }
+  .priority-med { background: var(--amber); }
+  .priority-low { background: var(--green); }
+
+  /* Callout */
+  .callout {
+    background: #fff3cd;
+    border-left: 4px solid var(--amber);
+    padding: 14px 18px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .callout strong { color: var(--brown); }
+
+  /* Direction arrows */
+  .dir-dark { color: var(--red); }
+  .dir-light { color: var(--amber); }
+  .dir-ok { color: var(--green); font-weight: 600; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .bar-label { width: 80px; font-size: 12px; }
+    .data-table { font-size: 11px; }
+    .data-table th, .data-table td { padding: 8px 6px; }
+    header h1 { font-size: 22px; }
+  }
+
+  .note-text { font-size: 12px; color: var(--muted); max-width: 260px; }
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <h1>V3 Shade Matcher Feedback Brief</h1>
+  <p>April 12, 2026 &middot; 10 submissions &middot; 152 total in database</p>
+</header>
+
+<div class="container">
+
+  <!-- Top-line stats -->
+  <div class="stats">
+    <div class="stat-card stat-red">
+      <div class="number">40%</div>
+      <div class="label">Skin Tone Accuracy</div>
+      <div class="sub">4 of 10 correct</div>
+    </div>
+    <div class="stat-card stat-green">
+      <div class="number">80%</div>
+      <div class="label">Undertone Accuracy</div>
+      <div class="sub">8 of 10 correct</div>
+    </div>
+    <div class="stat-card stat-red">
+      <div class="number">10%</div>
+      <div class="label">WTF Shade Accuracy</div>
+      <div class="sub">1 of 10 correct</div>
+    </div>
+    <div class="stat-card stat-amber">
+      <div class="number">9/10</div>
+      <div class="label">High Confidence</div>
+      <div class="sub">AI confident even when wrong</div>
+    </div>
+  </div>
+
+  <!-- Primary issue callout -->
+  <div class="callout">
+    <strong>Primary Issue:</strong> The AI systematically detects skin tone as too dark. 5 of 10 users reported "Too Dark," causing WTF shade recommendations to miss by 1-2 shades in the same direction. Undertone detection is the bright spot at 80%.
+  </div>
+
+  <!-- Skin Tone Breakdown -->
+  <div class="section">
+    <h2 class="section-title">Skin Tone Detection</h2>
+    <p class="section-subtitle">How users rated the AI's skin tone classification</p>
+
+    <div style="max-width:500px">
+      <div class="stacked-bar">
+        <div class="seg" style="width:40%;background:var(--green)">40%</div>
+        <div class="seg" style="width:50%;background:var(--red)">50%</div>
+        <div class="seg" style="width:10%;background:var(--amber)">10%</div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Correct (4)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Too Dark (5)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Too Light (1)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Undertone Breakdown -->
+  <div class="section">
+    <h2 class="section-title">Undertone Detection</h2>
+    <p class="section-subtitle">Undertone accuracy is strong; misses lean toward Neutral when it should be Cool or Warm</p>
+
+    <div style="max-width:500px">
+      <div class="stacked-bar">
+        <div class="seg" style="width:80%;background:var(--green)">80%</div>
+        <div class="seg" style="width:10%;background:#6a89cc">10%</div>
+        <div class="seg" style="width:10%;background:#e58e26">10%</div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Correct (8)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#6a89cc"></div> Should be Cool (1)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e58e26"></div> Should be Warm (1)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WTF Shade Gap -->
+  <div class="section">
+    <h2 class="section-title">WTF / Tinted Moisturizer Gap</h2>
+    <p class="section-subtitle">How far off the recommended shade was from what the user actually wears</p>
+
+    <div class="bar-chart" style="max-width:600px">
+      <div class="bar-row">
+        <div class="bar-label">Susan</div>
+        <div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--red)">-1</div></div>
+        <div class="bar-value dir-dark">Fair &rarr; Porcelain</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Susan (2)</div>
+        <div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--red)">-2</div></div>
+        <div class="bar-value dir-dark">Fair &rarr; Alabaster</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Kristie Chase</div>
+        <div class="bar-track"><div class="bar-fill" style="width:8%;background:var(--green)"></div></div>
+        <div class="bar-value dir-ok">Beige = Beige</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Denise Smith</div>
+        <div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--red)">-1</div></div>
+        <div class="bar-value dir-dark">Light &rarr; Ivory</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Denise (2)</div>
+        <div class="bar-track"><div class="bar-fill" style="width:45%;background:var(--red)">-1&ndash;2</div></div>
+        <div class="bar-value dir-dark">Light &rarr; Porc/Ivory</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Tonya Ettner</div>
+        <div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--amber)">+1</div></div>
+        <div class="bar-value dir-light">Fair &rarr; Light</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Robin</div>
+        <div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--red)">-1</div></div>
+        <div class="bar-value dir-dark">Light &rarr; Fair</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Rosemary</div>
+        <div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--amber)">+1</div></div>
+        <div class="bar-value dir-light">Beige &rarr; Medium</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">S S</div>
+        <div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--red)">-2+</div></div>
+        <div class="bar-value dir-dark">Beige &rarr; Ivory</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Krista Baran</div>
+        <div class="bar-track"><div class="bar-fill" style="width:45%;background:var(--red)">-1&ndash;2</div></div>
+        <div class="bar-value dir-dark">Light &rarr; Porcelain</div>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:10px">Red = AI too dark &nbsp;|&nbsp; Amber = AI too light &nbsp;|&nbsp; Green = correct</p>
+  </div>
+
+  <!-- Face Pencil -->
+  <div class="section">
+    <h2 class="section-title">Face Pencil Accuracy</h2>
+    <p class="section-subtitle">Recommended vs actual Face Pencil numbers (where provided)</p>
+
+    <div class="table-wrap">
+    <table class="data-table" style="max-width:600px">
+      <thead>
+        <tr><th>Name</th><th>AI Rec (Face)</th><th>Actual</th><th>Gap</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Susan</td><td>04</td><td>01</td><td class="dir-dark">3 too high</td></tr>
+        <tr><td>Denise Smith</td><td>06-07</td><td>05, 07</td><td class="dir-ok">In range</td></tr>
+        <tr><td>Tonya Ettner</td><td>04</td><td>08</td><td class="dir-light">4 too low</td></tr>
+        <tr><td>Robin</td><td>06-07</td><td>6</td><td class="dir-ok">Correct</td></tr>
+        <tr><td>Rosemary</td><td>07-09</td><td>11</td><td class="dir-light">2 too low</td></tr>
+        <tr><td>S S</td><td>07-09</td><td>4, 6</td><td class="dir-dark">3-5 too high</td></tr>
+        <tr><td>Krista Baran</td><td>06-07</td><td>2, 3</td><td class="dir-dark">4 too high</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px">Face Pencil errors go in both directions — no single systematic bias like WTF shades.</p>
+  </div>
+
+  <!-- Full detail table -->
+  <div class="section">
+    <h2 class="section-title">All 10 Submissions</h2>
+    <p class="section-subtitle">Complete detail for each entry received this morning</p>
+
+    <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>AI Skin Tone</th>
+          <th>Tone OK?</th>
+          <th>AI Undertone</th>
+          <th>Undertone OK?</th>
+          <th>AI WTF</th>
+          <th>Actual WTF</th>
+          <th>Ethnicity</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Susan</strong></td>
+          <td>Fair</td>
+          <td><span class="tag tag-too-dark">Too Dark</span></td>
+          <td>Cool</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Fair</td>
+          <td>Porcelain</td>
+          <td>White</td>
+          <td class="note-text">Outdoor late afternoon</td>
+        </tr>
+        <tr>
+          <td><strong>Susan</strong></td>
+          <td>Fair</td>
+          <td><span class="tag tag-too-dark">Too Dark</span></td>
+          <td>Cool</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Fair</td>
+          <td>Alabaster</td>
+          <td>White</td>
+          <td class="note-text">Outdoor not full sunlight</td>
+        </tr>
+        <tr>
+          <td><strong>Kristie Chase</strong></td>
+          <td>Light-Medium</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Neutral</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Beige</td>
+          <td>Beige</td>
+          <td>British/Irish/Norwegian</td>
+          <td class="note-text">Not sure of actual undertone; rest was on point</td>
+        </tr>
+        <tr>
+          <td><strong>Denise Smith</strong></td>
+          <td>Light</td>
+          <td><span class="tag tag-too-dark">Too Dark</span></td>
+          <td>Neutral</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Light</td>
+          <td>Ivory</td>
+          <td>Caucasian</td>
+          <td class="note-text">Makeup off, open door. "Light is too warm." Golden Hour doesn't suit her.</td>
+        </tr>
+        <tr>
+          <td><strong>Denise</strong></td>
+          <td>Light</td>
+          <td><span class="tag tag-too-dark">Too Dark</span></td>
+          <td>Neutral</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Light</td>
+          <td>Porcelain/Ivory</td>
+          <td>White</td>
+          <td class="note-text">&mdash;</td>
+        </tr>
+        <tr>
+          <td><strong>Tonya Ettner</strong></td>
+          <td>Fair</td>
+          <td><span class="tag tag-too-light">Too Light</span></td>
+          <td>Cool</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Fair</td>
+          <td>Light</td>
+          <td>Caucasian</td>
+          <td class="note-text">No makeup, natural light. "Undertone spot on."</td>
+        </tr>
+        <tr>
+          <td><strong>Robin</strong></td>
+          <td>Light</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Neutral</td>
+          <td><span class="tag tag-wrong">Should be Cool</span></td>
+          <td>Light</td>
+          <td>Fair</td>
+          <td>Caucasian</td>
+          <td class="note-text">Good lighting, no makeup</td>
+        </tr>
+        <tr>
+          <td><strong>Rosemary</strong></td>
+          <td>Light-Medium</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Neutral</td>
+          <td><span class="tag tag-wrong">Should be Warm</span></td>
+          <td>Beige</td>
+          <td>Medium</td>
+          <td>Caucasian</td>
+          <td class="note-text">Has redness; thinks she's neutral-warm leaning</td>
+        </tr>
+        <tr>
+          <td><strong>S S</strong></td>
+          <td>Light-Medium</td>
+          <td><span class="tag tag-too-dark">Too Dark</span></td>
+          <td>Neutral</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Beige</td>
+          <td>Ivory</td>
+          <td>&mdash;</td>
+          <td class="note-text">&mdash;</td>
+        </tr>
+        <tr>
+          <td><strong>Krista Baran</strong></td>
+          <td>Light</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Cool</td>
+          <td><span class="tag tag-correct">Yes</span></td>
+          <td>Light</td>
+          <td>Porcelain</td>
+          <td>White</td>
+          <td class="note-text">Shade varied across multiple photos taken minutes apart</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- Action items -->
+  <div class="section">
+    <h2 class="section-title">Action Items</h2>
+    <ol class="issue-list">
+      <li>
+        <span class="issue-priority priority-high"></span>
+        <strong>Fix dark-bias in skin tone detection.</strong>
+        50% of users said "Too Dark." The AI prompt or shade-mapping logic needs to shift 1 shade lighter for Fair&ndash;Light-Medium range. This is the single highest-impact fix.
+      </li>
+      <li>
+        <span class="issue-priority priority-high"></span>
+        <strong>Recalibrate WTF shade mapping.</strong>
+        Only 10% accuracy. Even when skin tone is correct, the WTF shade can miss (e.g. Robin: Light tone correct, but wears Fair in WTF). The tone-to-shade mapping table may need an independent audit.
+      </li>
+      <li>
+        <span class="issue-priority priority-med"></span>
+        <strong>Face Pencil mapping is unreliable.</strong>
+        Errors go both too high and too low with no clear pattern. Likely needs a complete rework of the number assignment logic.
+      </li>
+      <li>
+        <span class="issue-priority priority-med"></span>
+        <strong>Reduce Neutral-bias in undertone.</strong>
+        Both undertone misses were AI saying "Neutral" when it should have been Cool or Warm. Consider a threshold adjustment or tie-breaking rule away from Neutral.
+      </li>
+      <li>
+        <span class="issue-priority priority-med"></span>
+        <strong>Temper confidence scoring.</strong>
+        9 of 10 entries had "high" confidence, including clearly wrong results. Overconfidence erodes user trust.
+      </li>
+      <li>
+        <span class="issue-priority priority-low"></span>
+        <strong>Expand demographic testing.</strong>
+        All 10 respondents today are White/Caucasian. Need feedback from Medium, Medium-Dark, Dark, and Deep skin tones to validate across the full range.
+      </li>
+      <li>
+        <span class="issue-priority priority-low"></span>
+        <strong>Deduplicate form submissions.</strong>
+        Susan and Denise each submitted twice within ~2 minutes. Consider a confirmation screen or session-based dedup to prevent accidental doubles.
+      </li>
+    </ol>
+  </div>
+
+  <footer style="text-align:center;padding:24px 0;font-size:11px;color:var(--muted);border-top:1px solid var(--border)">
+    Generated from live Redis feedback data &middot; 10 entries from 2026-04-12 &middot; 152 total entries
+  </footer>
+
+</div>
+</body>
+</html>
