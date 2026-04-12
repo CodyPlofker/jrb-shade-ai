@@ -470,19 +470,23 @@ export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
   },
   Dark: {
     // V2: Changed from Rich/Deep → Almond (Almond 4.70 avg vs Deep 33% low ratings)
+    // V3: FP ranges corrected from Octane AI ground truth data (was 17-18 face / 15-17 eye — too light)
+    // Octane data: Dark Neutral = FP 20 face / FP 18 eye; Dark Warm = FP 21 face / FP 20 eye
     wtfShade: "Almond",
-    facePencilFace: "17-18",
-    facePencilEye: "15-17",
+    facePencilFace: "19-21",
+    facePencilEye: "17-19",
     neutralizer: "Dark Apricot",
     tintedPowder: "Medium",
     foundationStickShade: "Hazelnut",
   },
   Deep: {
-    // V2: Changed from Espresso → Cinnamon (Cinnamon 4.86 avg; Espresso/Deep for the very deepest only)
+    // V2: Changed from Espresso → Cinnamon (Cinnamon 4.86 avg)
+    // V3: FP ranges corrected from Octane AI ground truth (was FP 18 face / FP 17 eye — way too light)
+    // Octane data: Deep Neutral = FP 25 face / FP 23 eye; Dark/Deep = FP 20 face / FP 19 eye
     wtfShade: "Cinnamon",
-    facePencilFace: "18",
-    facePencilEye: "17",
-    neutralizer: "Dark Apricot",
+    facePencilFace: "23-25",
+    facePencilEye: "21-23",
+    neutralizer: "N/A",
     tintedPowder: "Dark",
     foundationStickShade: "Almond",
   },

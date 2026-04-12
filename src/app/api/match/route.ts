@@ -99,12 +99,33 @@ UNDERTONE CALIBRATION — V3 (expand neutral bucket):
 - Only assign Warm if you see clear yellow, golden, or peach undertones.
 - When in doubt between Cool/Neutral or Warm/Neutral — always default to Neutral. The neutral bucket was too narrow in V2.
 
-DARKER SKIN TONE CALIBRATION — V3:
+DARKER SKIN TONE CALIBRATION — V3 (corrected from Octane AI ground truth):
 - For Medium-Dark and Dark skin tones, the model has historically classified too light. If a complexion has clear depth and warmth that could be Medium-Dark or Dark, go darker.
-- Face Pencil for Dark skin is FP 17-18 (face) and FP 15-17 (eye). For Deep skin, FP 18 (face) and FP 17 (eye).
-- If you're recommending FP below 14 for someone who appears clearly dark-skinned, reconsider upward.
+- Face Pencil for Dark skin is FP 19-21 (face) and FP 17-19 (eye). For Deep skin, FP 23-25 (face) and FP 21-23 (eye).
+- CRITICAL: If you're recommending FP below 19 for someone who appears clearly dark-skinned, reconsider upward. If below 23 for deep skin, reconsider upward.
 - WTF for Dark = Almond (4.70 avg rating). WTF for Deep = Cinnamon (4.86 avg rating). Never recommend WTF Deep for Dark skin.
-- Sue-Mar example: Med-Dark customer actually wears FP 17 — the model initially gave her Medium results. When complexion has clear depth, go Med-Dark or Dark.
+- No neutralizer needed for Dark/Deep or Deep skin tones.
+
+## Octane AI Ground Truth Reference (verified makeup artist classifications)
+
+These are real customer photos with correct shade assignments from trained JRB makeup artists. Use these as calibration anchors:
+
+| Visual Description | Skin Tone | Undertone | FP Face | FP Eye | WTF Shade |
+|---|---|---|---|---|---|
+| Very pale, pink-toned, visible pink undertone | Pale | Cool | 1 | — | Alabaster |
+| Fair, rosy, pink cheeks, visible redness | Fair | Cool | 3 | 2 | Porcelain |
+| Fair, neutral — no strong warm or cool cast | Fair | Neutral | 5-6 | 3-5 | Fair/Ivory |
+| Light skin, neutral — slight warmth but not yellow | Light | Neutral | 6-9 | 5-8 | Beige |
+| Light-medium, neutral — common "everyday" skin | Light-Medium | Neutral | 9-12 | 8-10 | Beige/Medium |
+| Light-medium, yellow/warm undertone | Light-Medium | Warm | 10 | 8 | Medium |
+| Medium, neutral — olive or balanced tone | Medium | Neutral | 12 | 8 | Medium Honey |
+| Medium-tan, warm golden undertone | Medium-Dark | Warm | 15 | 12 | Medium Honey |
+| Medium, warm — yellow-golden cast | Medium | Warm | 15 | 9 | Medium Honey |
+| Dark, neutral — deep complexion, no strong cast | Dark | Neutral | 20 | 18 | Pecan/Almond |
+| Tan-dark, warm/golden undertone | Dark | Warm | 19 | 18 | Golden/Almond |
+| Dark, warm/golden — richer depth | Dark | Warm | 21 | 20 | Almond |
+| Dark/Deep, neutral — very deep complexion | Deep | Neutral | 20 | 19 | Chestnut |
+| Deep, neutral — deepest complexion | Deep | Neutral | 25 | 23 | Espresso |
 
 OLIVE UNDERTONES:
 - Olive skin can be cool-olive (gray-green cast) or warm-olive (yellow-green cast)
