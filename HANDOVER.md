@@ -1,5 +1,8 @@
 # JRB Shade AI — Handover Document
 
+> **Updated 2026-04-23** — current handover brief (shareable, styled): https://codyplofker.github.io/jrb-docs/ecom/briefs/shade-ai-handover-2026-04-23/
+> Source: `shade-matching-data/handover-2026-04-23.html`
+
 ## Project Overview
 - AI-powered shade matching tool for Jones Road Beauty. Users take a selfie, Claude Vision analyzes skin tone/undertone, and recommends Miracle Balm tints + complexion products with specific shade names.
 - Three versions: **V1** (production, customer-facing), **V2** (CAB testing with feedback form), **V3** (latest — inline feedback, Foundation Stick)
@@ -110,10 +113,11 @@ Seven data-driven improvements over V1 from 30,697 shade consultations + 2,735 J
 ## Current State
 
 ### Working
-- **V1** at https://jrb-shade-ai.vercel.app — fully operational, customer-facing
+- **V1** at https://jrb-shade-ai.vercel.app — fully operational, customer-facing (114 feedback submissions)
 - **V2** at https://jrb-shade-ai-v2.vercel.app — CAB testing with separate feedback form
-- **V3** at https://jrb-shade-ai-v3.vercel.app — latest: Foundation Stick + inline feedback + V3 calibration
+- **V3** at https://jrb-shade-ai-v3.vercel.app — latest: Foundation Stick + inline feedback + V3 calibration (66 feedback submissions, latest April 15)
 - All versions share the same Redis instance (key: `shade-feedback-entries`); distinguished by `version` field
+- **V3 accuracy as of 2026-04-23**: skin tone 42% (28/66 marked "Yes"; 35% still "Too Light"), undertone 68% (45/66; 18% miss is "should be Neutral")
 
 ### Git Status
 - **Branch**: `overnight/shade-ai-v3`
