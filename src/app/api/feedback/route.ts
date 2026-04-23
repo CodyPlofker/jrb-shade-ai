@@ -33,6 +33,8 @@ export interface FeedbackEntry {
   ethnicity: string;
   notes: string;
   hasImage: boolean;
+  version?: string;
+  recommendedFoundationStick?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -58,6 +60,8 @@ export async function POST(request: NextRequest) {
       ethnicity: body.ethnicity || "",
       notes: body.notes || "",
       hasImage: !!body.imageData,
+      version: body.version || "",
+      recommendedFoundationStick: body.recommendedFoundationStick || "",
     };
 
     // Save entry to Redis list (push to front)
