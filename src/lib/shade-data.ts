@@ -350,13 +350,12 @@ export const miracleBalmUrls: Record<string, string> = {
     "https://jonesroadbeauty.com/products/miracle-balm?variant=au-naturel",
 };
 
-// V2: Complexion shade names by skin tone — updated with undertone-aware Face Pencil
-// Changes from V1:
-// - Face Pencil ranges shifted 1 shade lighter (data shows "too dark" > "too light" complaints)
-// - FP 01 for Fair → FP 02 (FP 01 gets "too light" 70 mentions)
-// - WTF for Dark → Almond/Cinnamon instead of Deep (Deep has 33% low ratings)
-// - Tinted Face Powder for Medium-Dark → Medium (Dark had 40% low ratings)
-// - Neutralizer for Light skin → Fair Pink (Light Peachy Pink gets "too pink")
+// V4: Complexion shade names by skin tone — REVERTED V2's "shifted lighter" change
+// V4 changes from V3:
+// - Face Pencil ranges REVERTED to V1 values (V2's "shifted 1 lighter" caused 35% "too light" miss rate)
+// - WTF for Dark → Almond/Cinnamon (kept from V2 — Deep had 33% low ratings)
+// - Tinted Face Powder for Medium-Dark → Medium (kept from V2 — Dark had 40% low ratings)
+// - Neutralizer for Light skin → Fair Pink (kept from V2)
 export interface ComplexionShadeMap {
   wtfShade: string;
   facePencilFace: string;
@@ -374,24 +373,22 @@ export function getComplexionShades(skinTone: SkinTone, undertone: Undertone): C
   // V3: Always apply undertone-aware Foundation Stick shade
   const foundationStickShade = foundationStickByTone[skinTone][undertone];
 
-  // V2 Rec #4: Undertone differentiation for FP ranges (Light and Light-Medium)
+  // V4: Undertone differentiation for Light and Light-Medium (one shade darker than V2/V3)
   if (skinTone === "Light") {
     if (undertone === "Cool") {
-      return { ...base, facePencilFace: "06-07", facePencilEye: "04-05", foundationStickShade };
-    } else if (undertone === "Warm") {
       return { ...base, facePencilFace: "07-08", facePencilEye: "05-06", foundationStickShade };
+    } else if (undertone === "Warm") {
+      return { ...base, facePencilFace: "08-09", facePencilEye: "06-07", foundationStickShade };
     }
-    // Neutral gets base FP, just update FS
     return { ...base, foundationStickShade };
   }
 
   if (skinTone === "Light-Medium") {
     if (undertone === "Cool") {
-      return { ...base, facePencilFace: "07-09", facePencilEye: "05-07", foundationStickShade };
-    } else if (undertone === "Warm") {
       return { ...base, facePencilFace: "08-10", facePencilEye: "06-08", foundationStickShade };
+    } else if (undertone === "Warm") {
+      return { ...base, facePencilFace: "09-11", facePencilEye: "07-09", foundationStickShade };
     }
-    // Neutral gets base FP, just update FS
     return { ...base, foundationStickShade };
   }
 
@@ -415,55 +412,54 @@ export const foundationStickByTone: Record<SkinTone, Record<"Cool" | "Warm" | "N
 export const complexionShadesByTone: Record<SkinTone, ComplexionShadeMap> = {
   Pale: {
     wtfShade: "Porcelain",
-    // V2: Shifted 1 lighter — was 03-04, now 02-03
-    facePencilFace: "02-03",
-    facePencilEye: "01-02",
+    // V4: Reverted to V1 range (was 02-03 in V2 — too light)
+    facePencilFace: "03-04",
+    facePencilEye: "02-03",
     neutralizer: "Fair Pink",
     tintedPowder: "Light",
-    foundationStickShade: "Alabaster", // Neutral default; getComplexionShades() overrides for Cool/Warm
+    foundationStickShade: "Alabaster",
   },
   Fair: {
     wtfShade: "Fair",
-    // V2: FP 01 gets "too light" (70 mentions) → recommend 04 instead of 05
-    facePencilFace: "04",
-    facePencilEye: "02-03",
+    // V4: Held at FP 04-05 (V2 FP 04 was correct floor; bumped upper to 05 for warm)
+    facePencilFace: "04-05",
+    facePencilEye: "03-04",
     neutralizer: "Fair Pink / Fair Peach",
     tintedPowder: "Light",
     foundationStickShade: "Neutral Fair",
   },
   Light: {
     wtfShade: "Light",
-    // V2: Shifted 1 lighter — was 07-08, now 06-07 (neutral default; cool/warm handled by getComplexionShades)
-    facePencilFace: "06-07",
-    facePencilEye: "04-05",
-    // V2: Changed from Light Peachy Pink → Fair Pink (Light Peachy Pink gets "too pink")
+    // V4: Reverted to V1 range (was 06-07 in V2 — too light)
+    facePencilFace: "07-08",
+    facePencilEye: "05-06",
     neutralizer: "Fair Pink",
     tintedPowder: "Light",
     foundationStickShade: "Ivory",
   },
   "Light-Medium": {
     wtfShade: "Beige",
-    // V2: Shifted 1 lighter — was 08-10, now 07-09
-    facePencilFace: "07-09",
-    facePencilEye: "05-07",
+    // V4: Reverted to V1 range (was 07-09 in V2 — too light)
+    facePencilFace: "08-10",
+    facePencilEye: "06-08",
     neutralizer: "Light Peachy Pink",
     tintedPowder: "Light",
     foundationStickShade: "Neutral Beige",
   },
   Medium: {
     wtfShade: "Medium",
-    // V2: Shifted 1 lighter — was 09-12, now 08-11
-    facePencilFace: "08-11",
-    facePencilEye: "07-09",
+    // V4: Reverted to V1 range (was 08-11 in V2 — too light)
+    facePencilFace: "09-12",
+    facePencilEye: "08-10",
     neutralizer: "Medium Peachy Pink",
     tintedPowder: "Medium",
     foundationStickShade: "Neutral Medium",
   },
   "Medium-Dark": {
     wtfShade: "Medium Honey",
-    // V2: Shifted 1 lighter — was 13-15, now 12-14
-    facePencilFace: "12-14",
-    facePencilEye: "10-12",
+    // V4: Reverted to V1 range (was 12-14 in V2 — too light)
+    facePencilFace: "13-15",
+    facePencilEye: "11-13",
     neutralizer: "Medium Peachy Pink",
     tintedPowder: "Medium",
     foundationStickShade: "Neutral Honey",
