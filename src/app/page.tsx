@@ -110,7 +110,7 @@ export default function Home() {
         recommendedFoundationStick:
           aiResult?.complexion.shades?.foundationStickShade || "",
         imageData: thumbnail,
-        version: "v3",
+        version: "v4",
       };
 
       const res = await fetch("/api/feedback", {
@@ -435,7 +435,7 @@ function Header() {
         </svg>
       </a>
       <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-mono tracking-wider text-[var(--jrb-muted)] bg-[#f0f0f0] px-2 py-0.5 rounded">
-        V3 BETA
+        V4 BETA
       </span>
     </header>
   );
