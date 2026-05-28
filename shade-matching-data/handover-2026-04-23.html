@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shade AI — Handover Brief</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #000; line-height: 1.6; }
+
+  .header { background: #000; color: #fff; padding: 60px 40px 50px; }
+  .header h1 { font-size: 42px; font-weight: 300; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .header .subtitle { font-size: 18px; color: #999; font-weight: 400; }
+  .header .date { font-size: 14px; color: #666; margin-top: 16px; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 0 40px; }
+
+  .toc { background: #f8f8f8; padding: 32px 40px; margin: 40px 0; border-radius: 2px; }
+  .toc h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: #666; margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 6px; font-size: 15px; }
+  .toc a { color: #000; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  section { padding: 50px 0; border-bottom: 1px solid #eee; }
+  section:last-child { border-bottom: none; }
+  h2 { font-size: 28px; font-weight: 600; margin-bottom: 24px; letter-spacing: -0.3px; }
+  h3 { font-size: 20px; font-weight: 600; margin: 32px 0 16px; }
+  h4 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
+  p { margin-bottom: 16px; font-size: 16px; }
+  ul, ol { margin-bottom: 16px; padding-left: 24px; }
+  li { margin-bottom: 8px; font-size: 16px; }
+  strong { font-weight: 700; }
+  code { font-family: 'SF Mono', Menlo, monospace; font-size: 13px; background: #f4f4f4; padding: 2px 6px; border-radius: 2px; }
+  pre { background: #f8f8f8; padding: 16px; border-radius: 2px; overflow-x: auto; margin: 16px 0; font-size: 13px; line-height: 1.5; }
+  pre code { background: transparent; padding: 0; }
+  a { color: #000; text-decoration: underline; }
+  hr.divider { border: none; border-top: 2px solid #000; margin: 80px 0 0; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 24px 0; }
+  .stat-card { background: #f8f8f8; padding: 24px; border-radius: 2px; text-align: center; }
+  .stat-card .number { font-size: 36px; font-weight: 700; color: #000; line-height: 1; }
+  .stat-card .label { font-size: 12px; color: #666; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .sub { font-size: 11px; color: #999; margin-top: 4px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+  th { background: #000; color: #fff; padding: 12px 16px; text-align: left; font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 12px 16px; border-bottom: 1px solid #eee; vertical-align: top; }
+  tr:hover td { background: #fafafa; }
+
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 2px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge.green { background: #c6f6d5; color: #22543d; }
+  .badge.red { background: #fed7d7; color: #9b2c2c; }
+  .badge.yellow { background: #fefcbf; color: #744210; }
+  .badge.gray { background: #e2e8f0; color: #4a5568; }
+  .badge.live { background: #c6f6d5; color: #22543d; }
+
+  .phase { display: grid; grid-template-columns: 120px 1fr; gap: 24px; padding: 20px 0; border-bottom: 1px solid #eee; }
+  .phase:last-child { border-bottom: none; }
+  .phase .v { font-weight: 700; font-size: 20px; }
+  .phase .v .date { display: block; font-weight: 400; font-size: 12px; color: #666; margin-top: 4px; }
+  .phase .desc h4 { margin: 0 0 8px; font-size: 16px; }
+  .phase .desc p { margin: 0; color: #333; font-size: 15px; }
+  .phase .desc ul { margin: 8px 0 0; }
+  .phase .desc li { font-size: 14px; color: #333; margin-bottom: 4px; }
+
+  .accuracy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0; }
+  .accuracy-card { background: #f8f8f8; padding: 24px; border-radius: 2px; }
+  .accuracy-card h4 { margin: 0 0 16px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: #666; }
+  .accuracy-card .top-num { font-size: 48px; font-weight: 700; line-height: 1; }
+  .accuracy-card .top-label { font-size: 13px; color: #666; margin-top: 4px; margin-bottom: 16px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 13px; }
+  .bar-row .lab { width: 130px; flex-shrink: 0; }
+  .bar-row .bar { flex: 1; height: 16px; background: #e8e8e8; border-radius: 2px; overflow: hidden; }
+  .bar-row .bar .fill { height: 100%; background: #000; }
+  .bar-row .bar .fill.good { background: #22543d; }
+  .bar-row .bar .fill.bad { background: #9b2c2c; }
+  .bar-row .bar .fill.warn { background: #b7791f; }
+  .bar-row .ct { width: 56px; text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; color: #666; }
+
+  .callout { background: #fffbeb; border-left: 4px solid #d69e2e; padding: 20px 24px; margin: 24px 0; border-radius: 0 2px 2px 0; }
+  .callout strong { display: block; margin-bottom: 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .callout p { margin: 0; font-size: 15px; }
+  .callout.danger { background: #fef2f2; border-left-color: #9b2c2c; }
+  .callout.success { background: #f0fdf4; border-left-color: #22543d; }
+
+  .next-step { display: grid; grid-template-columns: 40px 80px 1fr; gap: 16px; padding: 16px 0; border-bottom: 1px solid #eee; align-items: start; }
+  .next-step:last-child { border-bottom: none; }
+  .next-step .num { background: #000; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .next-step .pri { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 8px; border-radius: 2px; text-align: center; }
+  .next-step .pri.p1 { background: #fed7d7; color: #9b2c2c; }
+  .next-step .pri.p2 { background: #fefcbf; color: #744210; }
+  .next-step .pri.p3 { background: #e2e8f0; color: #4a5568; }
+  .next-step h4 { margin: 0 0 4px; font-size: 16px; }
+  .next-step p { margin: 0; font-size: 14px; color: #555; }
+
+  .tech-section { background: #fafafa; }
+  .tech-section .section-label { display: inline-block; background: #000; color: #fff; padding: 6px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 16px; }
+
+  @media (max-width: 700px) {
+    .header { padding: 40px 24px; }
+    .header h1 { font-size: 32px; }
+    .container { padding: 0 24px; }
+    .accuracy-grid { grid-template-columns: 1fr; }
+    .phase { grid-template-columns: 1fr; gap: 8px; }
+    .next-step { grid-template-columns: 1fr; gap: 8px; }
+    .next-step .num, .next-step .pri { display: inline-block; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="container">
+    <h1>Shade AI — Handover Brief</h1>
+    <p class="subtitle">JRB AI shade matching tool: status, phases, training, feedback, and next steps</p>
+    <p class="date">Last updated: April 23, 2026 (V4 deployed) · Branch: <code style="color:#fff;background:#222;">overnight/shade-ai-v3</code> · Latest deploy: V4 prompt overhaul</p>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#status">Status — what's live right now</a></li>
+    <li><a href="#phases">Phase history (MVP → V4)</a></li>
+    <li><a href="#accuracy">Accuracy snapshot — V3 actuals + V4 projection</a></li>
+    <li><a href="#training">Training data — what the model learned from</a></li>
+    <li><a href="#feedback">Feedback tool — form, Redis, dashboard</a></li>
+    <li><a href="#nextsteps">Punch list — what to do next</a></li>
+    <li><a href="#tech">Technical appendix (engineer continuing the work)</a></li>
+  </ol>
+</div>
+
+<section id="status">
+  <h2>1. Status — what's live right now</h2>
+  <p>Shade AI is a customer-facing tool that takes a selfie, sends it to Claude Vision (Sonnet 4), and recommends a Miracle Balm tint, complexion routine, and Foundation Stick shade. Four versions are deployed in parallel — V1 is the customer-facing production app, V2/V3 were calibration rounds, and <strong>V4 is the latest, deployed April 23 to fix the "too light" pattern that V3.1 didn't solve</strong>.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="number">4</div>
+      <div class="label">Versions live</div>
+      <div class="sub">V1, V2, V3, V4 on Vercel</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">180</div>
+      <div class="label">Total feedback submissions</div>
+      <div class="sub">114 V1 + 66 V3 (V4 just launched)</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">60<span style="font-size:24px;">%</span></div>
+      <div class="label">V4 projected skin-tone accuracy</div>
+      <div class="sub">Back-tested vs V3 actual 42%</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">72<span style="font-size:24px;">%</span></div>
+      <div class="label">V4 projected undertone accuracy</div>
+      <div class="sub">Back-tested vs V3 actual 68%</div>
+    </div>
+  </div>
+
+  <h3>The four deployments</h3>
+  <table>
+    <thead>
+      <tr><th>Version</th><th>URL</th><th>Branch</th><th>Purpose</th><th>Submissions</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>V1</strong></td>
+        <td><a href="https://jrb-shade-ai.vercel.app">jrb-shade-ai.vercel.app</a></td>
+        <td><code>main</code></td>
+        <td>Production (customer-facing)</td>
+        <td>114</td>
+        <td><span class="badge live">Live</span></td>
+      </tr>
+      <tr>
+        <td><strong>V2</strong></td>
+        <td><a href="https://jrb-shade-ai-v2.vercel.app">jrb-shade-ai-v2.vercel.app</a></td>
+        <td><code>overnight/shade-ai-v2</code></td>
+        <td>CAB testing w/ separate feedback page</td>
+        <td>0 (rolled into V1 totals pre-tag)</td>
+        <td><span class="badge live">Live</span></td>
+      </tr>
+      <tr>
+        <td><strong>V3</strong></td>
+        <td><a href="https://jrb-shade-ai-v3.vercel.app">jrb-shade-ai-v3.vercel.app</a></td>
+        <td><code>overnight/shade-ai-v3</code></td>
+        <td>Foundation Stick + inline feedback + V3.1 calibration</td>
+        <td>66</td>
+        <td><span class="badge live">Live</span></td>
+      </tr>
+      <tr style="background:#faf5ff;">
+        <td><strong>V4</strong> 🆕</td>
+        <td><a href="https://jrb-shade-ai-v4.vercel.app">jrb-shade-ai-v4.vercel.app</a></td>
+        <td><code>overnight/shade-ai-v3</code> (same)</td>
+        <td><strong>Latest — fixes prompt contradiction, adds selfie-lighting compensation, stricter Neutral default</strong></td>
+        <td>0 (just launched 4/23)</td>
+        <td><span class="badge live">Live</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:14px;color:#666;">All four share one Upstash Redis instance (key <code>shade-feedback-entries</code>); entries differentiated by <code>version</code> field. V4 deployed April 23.</p>
+
+  <div class="callout success">
+    <strong>What just shipped (V4 — April 23)</strong>
+    <p>Diagnosed the V3 root cause: the system prompt had a direct contradiction — V2's "ALWAYS favor LIGHTER" rule for Face Pencil (lines 50–54 of <code>match/route.ts</code>) was overriding V3's added "lean DARKER" instruction. The model was following the louder/older rule. V4 deletes that rule, adds explicit selfie-lighting compensation (front-light/flash bias), makes Neutral the default unless TWO pieces of positive evidence support Cool/Warm, and reverts V2's "shifted 1 lighter" Foundation Stick lookup ranges back to V1 values.</p>
+  </div>
+</section>
+
+<section id="phases">
+  <h2>2. Phase history</h2>
+  <p>The project moved through five named phases plus a calibration patch. Each version is a separate Vercel project, so older versions stay reachable for comparison.</p>
+
+  <div class="phase">
+    <div class="v">MVP <span class="date">Late March 2026</span></div>
+    <div class="desc">
+      <h4>Camera + Claude Vision proof-of-concept</h4>
+      <p>Bare-bones flow: take a selfie, send to Claude Sonnet 4 Vision, get back a JSON shade recommendation. No training data, no feedback collection.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="v">V1 <span class="date">Late March / Early April</span></div>
+    <div class="desc">
+      <h4>Customer-shippable production app</h4>
+      <ul>
+        <li>UX hardening (square camera, prominent CTA, real JRB logo)</li>
+        <li>Real complexion shade names from CX data baked into system prompt (12 months of Richpanel conversations)</li>
+        <li>Tint-first results layout — Miracle Balm shown before complexion routine</li>
+        <li>Feedback collection added (separate <code>/feedback</code> page); persistent storage via Upstash Redis</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="v">V2 <span class="date">Early April</span></div>
+    <div class="desc">
+      <h4>Seven data-driven recommendations from full training dataset</h4>
+      <p>Built on top of 33,482 Richpanel shade conversations and 2,735 Junip review cross-references. Improved undertone detection rules, expanded shade vocabulary, refined fallback logic. Used for CAB (Customer Advisory Board) testing — separate <code>/feedback</code> page made it easy to send a focused testing link.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="v">V3 <span class="date">April 11</span></div>
+    <div class="desc">
+      <h4>Foundation Stick + inline feedback + calibration from CAB</h4>
+      <ul>
+        <li><strong>Foundation Stick integration</strong> — new product added to results. Lookup table maps 8 skin tones × 3 undertones to confirmed shade names. Step 1 in results now shows a 3-tier coverage selector: Sheer (JETM) / Light-Medium (WTF) / Full (Foundation Stick).</li>
+        <li><strong>Inline feedback</strong> — feedback form moved from a separate page to directly below the results. Higher capture rate.</li>
+        <li><strong>Calibration from 89 CAB submissions</strong>: lean darker (model was skewing 1 shade too light), expand neutral bucket (default to Neutral when ambiguous), add explicit FP range guidance for Med-Dark/Dark.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="v">V3.1 <span class="date">April 12</span></div>
+    <div class="desc">
+      <h4>Dark/Deep FP corrections + Octane AI few-shot examples</h4>
+      <p>Patch on top of V3: tightened FP shade ranges for Dark/Deep skin tones (was still recommending too light), and added few-shot examples from Octane AI conversations to the system prompt.</p>
+    </div>
+  </div>
+
+  <div class="phase" style="background:#faf5ff;border-left:3px solid #c084fc;padding-left:16px;">
+    <div class="v">V4 <span class="date">April 23 — LATEST</span></div>
+    <div class="desc">
+      <h4>Prompt overhaul — root-cause fix for the "too light" pattern</h4>
+      <ul>
+        <li><strong>Removed the direct contradiction</strong> in the V3 system prompt: V2's "FACE PENCIL — ALWAYS favor LIGHTER" rule was silently overriding V3's "lean darker" instruction. Replaced with "FACE PENCIL — LEAN DARKER (V4 OVERRIDE)."</li>
+        <li><strong>Selfie-lighting compensation</strong> — explicit guidance that front-lighting/flash washes out 1–2 shades. The model now compensates rather than taking the photo at face value.</li>
+        <li><strong>Stricter Neutral default</strong> — Neutral is now the mandatory default. Cool or Warm requires TWO pieces of positive evidence. Pink cheeks alone = blood flow, not undertone.</li>
+        <li><strong>FP lookup table reverted</strong> — V2 had shifted ranges 1 shade lighter (Pale 02–03, Light 06–07, Medium 08–11). V4 reverts to V1 values (Pale 03–04, Light 07–08, Medium 09–12).</li>
+        <li><strong>Worked examples</strong> for Light → Light-Med, Medium → Medium-Dark drift cases the model was getting wrong.</li>
+        <li><strong>V4-specific dashboard</strong> at <code>shade-feedback-dashboard-v4/</code> with V3 vs V4 head-to-head comparison block.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="accuracy">
+  <h2>3. Accuracy snapshot — V3 actuals + V4 projection</h2>
+  <p>Pulled from the 66 V3 feedback submissions in Redis as of April 23. This is the most important read on whether the V3.1 calibration actually worked — and the basis for the V4 back-test.</p>
+
+  <div class="accuracy-grid">
+    <div class="accuracy-card">
+      <h4>Skin tone</h4>
+      <div class="top-num">42%</div>
+      <div class="top-label">marked correct (28 of 66)</div>
+      <div class="bar-row"><div class="lab">Yes (correct)</div><div class="bar"><div class="fill good" style="width:42%;"></div></div><div class="ct">28</div></div>
+      <div class="bar-row"><div class="lab">Too Light</div><div class="bar"><div class="fill bad" style="width:35%;"></div></div><div class="ct">23</div></div>
+      <div class="bar-row"><div class="lab">Too Dark</div><div class="bar"><div class="fill warn" style="width:18%;"></div></div><div class="ct">12</div></div>
+      <div class="bar-row"><div class="lab">Way Off</div><div class="bar"><div class="fill bad" style="width:3%;"></div></div><div class="ct">2</div></div>
+    </div>
+    <div class="accuracy-card">
+      <h4>Undertone</h4>
+      <div class="top-num">68%</div>
+      <div class="top-label">marked correct (45 of 66)</div>
+      <div class="bar-row"><div class="lab">Yes (correct)</div><div class="bar"><div class="fill good" style="width:68%;"></div></div><div class="ct">45</div></div>
+      <div class="bar-row"><div class="lab">Should be Neutral</div><div class="bar"><div class="fill warn" style="width:18%;"></div></div><div class="ct">12</div></div>
+      <div class="bar-row"><div class="lab">Should be Cool</div><div class="bar"><div class="fill bad" style="width:6%;"></div></div><div class="ct">4</div></div>
+      <div class="bar-row"><div class="lab">Should be Warm</div><div class="bar"><div class="fill bad" style="width:6%;"></div></div><div class="ct">4</div></div>
+    </div>
+  </div>
+
+  <div class="callout danger">
+    <strong>Headline finding (V3)</strong>
+    <p>V3.1 was supposed to fix the "skewing too light" pattern, but <strong>35% of V3 submissions still mark the result as "Too Light"</strong> — same direction of error as before V3 calibration. Root cause (found 4/23): the system prompt had a direct contradiction — V2's "ALWAYS favor LIGHTER" rule for Face Pencil was overriding V3's "lean DARKER" instruction. The model followed the louder/older rule. <strong>V4 deletes the contradiction.</strong></p>
+  </div>
+
+  <div class="callout">
+    <strong>Secondary finding (V3)</strong>
+    <p>The biggest undertone miss is <strong>Neutral (18% of submissions)</strong> — model is still picking Cool or Warm when the customer says they're Neutral. The "expand the neutral bucket" V3 instruction worked partially but needs more weight. <strong>V4 makes Neutral the mandatory default unless TWO pieces of positive evidence support Cool/Warm.</strong></p>
+  </div>
+
+  <div class="callout success">
+    <strong>V4 back-test projection</strong>
+    <p>Applied V4's calibration deltas to V3's 66-entry error distribution under conservative assumptions (70% of V3 too-light errors flip to correct from lean-darker + lighting comp; 15% of V3 correct flip to too-dark from over-correction risk; 75% of should-be-Neutral undertone errors flip to correct; 15% of correct Cool/Warm calls flip to wrong Neutral).</p>
+    <ul>
+      <li><strong>Skin tone</strong>: 42% (V3 actual) → <strong>60% projected (V4)</strong> — +18 pts</li>
+      <li><strong>Undertone</strong>: 68% (V3 actual) → <strong>72% projected (V4)</strong> — +4 pts</li>
+    </ul>
+    <p style="font-size:13px;color:#666;margin-top:8px;">Projection only — needs real V4 submissions to validate. Top of the punch list.</p>
+  </div>
+</section>
+
+<section id="training">
+  <h2>4. Training data</h2>
+  <p>Calibration is grounded in real CX history, not a labeled training set. Two sources, cross-referenced.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="number">33,482</div>
+      <div class="label">Richpanel conversations</div>
+      <div class="sub">Tagged for shade matching</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">2,735</div>
+      <div class="label">Junip cross-refs</div>
+      <div class="sub">Validated review outcomes</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">2,267</div>
+      <div class="label">Tier 1 (Gold)</div>
+      <div class="sub">CX rec + Junip outcome</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">18,055</div>
+      <div class="label">Parseable recs</div>
+      <div class="sub">Used for shade distribution</div>
+    </div>
+  </div>
+
+  <h3>Tier breakdown</h3>
+  <table>
+    <thead><tr><th>Tier</th><th>Description</th><th>Count</th></tr></thead>
+    <tbody>
+      <tr><td>Tier 1 — Gold</td><td>CX recommendation + Junip review outcome (we know the outcome stuck)</td><td>2,267</td></tr>
+      <tr><td>Tier 2 — Silver</td><td>CX recommendation + customer follow-up feedback</td><td>2,262</td></tr>
+      <tr><td>Tier 3 — Bronze</td><td>CX recommendation only (no follow-up)</td><td>13,526</td></tr>
+      <tr><td>Tier 4 — Context</td><td>Conversation but no parseable recommendation</td><td>15,427</td></tr>
+      <tr><td><strong>Total</strong></td><td></td><td><strong>33,482</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>What CX actually recommends — Face Pencil</h3>
+  <p>Bell curve clearly centered on light-medium. Top four shades are 5/6/7/8 (43.9% combined).</p>
+  <table>
+    <thead><tr><th>Shade</th><th>Recommended</th><th>% of total</th></tr></thead>
+    <tbody>
+      <tr><td>6</td><td>5,382</td><td>16.1%</td></tr>
+      <tr><td>8</td><td>3,369</td><td>10.1%</td></tr>
+      <tr><td>7</td><td>2,962</td><td>8.9%</td></tr>
+      <tr><td>5</td><td>2,928</td><td>8.8%</td></tr>
+      <tr><td>9</td><td>2,587</td><td>7.7%</td></tr>
+      <tr><td>11</td><td>1,826</td><td>5.5%</td></tr>
+      <tr><td>4</td><td>1,697</td><td>5.1%</td></tr>
+      <tr><td>3</td><td>1,642</td><td>4.9%</td></tr>
+      <tr><td>2</td><td>1,560</td><td>4.7%</td></tr>
+      <tr><td>17–25 (combined)</td><td>~1,008</td><td>~3.0%</td></tr>
+    </tbody>
+  </table>
+
+  <h3>What CX actually recommends — Miracle Balm</h3>
+  <p>Dusty Rose dominates. Tawny + Bronze cover most warm-leaning customers.</p>
+  <table>
+    <thead><tr><th>Shade</th><th>Recommended</th><th>% of total</th></tr></thead>
+    <tbody>
+      <tr><td>Dusty Rose</td><td>3,598</td><td>42.2%</td></tr>
+      <tr><td>Tawny</td><td>1,337</td><td>15.7%</td></tr>
+      <tr><td>Bronze</td><td>961</td><td>11.3%</td></tr>
+      <tr><td>Flushed</td><td>503</td><td>5.9%</td></tr>
+      <tr><td>Sunkissed</td><td>269</td><td>3.2%</td></tr>
+      <tr><td>Au Naturel</td><td>249</td><td>2.9%</td></tr>
+      <tr><td>Magic Hour</td><td>188</td><td>2.2%</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Known gap</strong>
+    <p>Dark-tone CX training data is thin. V3.1 added few-shot examples from Octane AI, but the pipeline needs more Richpanel conversations from darker-skinned customers. The script <code>extract-cc-conversations.py</code> is half-done (timed out mid-run; progress JSON exists in <code>shade-matching-data/</code>) and needs to be re-run.</p>
+  </div>
+</section>
+
+<section id="feedback">
+  <h2>5. Feedback tool</h2>
+  <p>How customer feedback gets from the screen into a dashboard we can act on.</p>
+
+  <h3>Flow</h3>
+  <ol>
+    <li><strong>Customer submits selfie</strong> on V3 → sees recommendation</li>
+    <li><strong>Inline form below results</strong> asks: was the skin tone right? was the undertone right? what did you actually buy? notes?</li>
+    <li><strong>POST <code>/api/feedback</code></strong> writes to Upstash Redis (key <code>shade-feedback-entries</code>) tagged with <code>version: "v3"</code></li>
+    <li><strong>Dashboard</strong> at <code>shade-feedback-dashboard/index.html</code> fetches via <code>GET /api/feedback</code>, renders password-gated table with filters by status</li>
+  </ol>
+
+  <h3>What's captured</h3>
+  <table>
+    <thead><tr><th>Field</th><th>Source</th><th>Used for</th></tr></thead>
+    <tbody>
+      <tr><td><code>skinToneDetected</code> / <code>undertoneDetected</code></td><td>Claude Vision response</td><td>Compare to customer self-report</td></tr>
+      <tr><td><code>recommendedFacePencil</code> / <code>recommendedWtfShade</code> / <code>recommendedMBShades</code> / <code>recommendedFoundationStick</code></td><td>Claude + lookup tables</td><td>Show what we told them</td></tr>
+      <tr><td><code>actualWtfShade</code> / <code>actualFacePencilShade</code> / <code>actualMiracleBalmShades</code></td><td>Customer fills in</td><td>Show what they actually wear</td></tr>
+      <tr><td><code>skinToneCorrect</code> / <code>undertoneCorrect</code></td><td>Customer evaluates (Yes / Too Light / Too Dark / Way Off / Should be X)</td><td>Drives the accuracy snapshot</td></tr>
+      <tr><td><code>ethnicity</code> / <code>notes</code></td><td>Customer optional</td><td>Qualitative read</td></tr>
+      <tr><td><code>version</code></td><td>App tag</td><td>Filter V1 vs V3 results</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Dashboards</h3>
+  <ul>
+    <li><strong>All-versions dashboard</strong> — <code>/Users/codyplofker/Desktop/01-Projects/shade-feedback-dashboard/index.html</code>. Open in browser → password → all submissions across V1/V3, filter by status, expand any entry for full Claude reasoning + customer notes.</li>
+    <li><strong>V4-only dashboard</strong> 🆕 — <code>/Users/codyplofker/Desktop/01-Projects/shade-feedback-dashboard-v4/index.html</code>. Filters Redis to <code>version === "v4"</code> entries only. Includes a V3 vs V4 head-to-head comparison block with 4 metrics (skin-tone correct %, too-light %, undertone correct %, should-be-Neutral %). Purple V4 theme. Hits <code>https://jrb-shade-ai-v4.vercel.app/api/feedback</code>. Password: <code>jrb2026</code>.</li>
+  </ul>
+</section>
+
+<section id="nextsteps">
+  <h2>6. Punch list — what to do next</h2>
+  <p>Ordered by what would move the needle most.</p>
+
+  <div class="next-step">
+    <div class="num">1</div>
+    <div class="pri p1">P1</div>
+    <div>
+      <h4>Validate V4 with real submissions</h4>
+      <p>V4 is back-tested to project +18 pts skin-tone accuracy (42% → 60%) and +4 pts undertone (68% → 72%), but has zero real submissions yet. Share <a href="https://jrb-shade-ai-v4.vercel.app">jrb-shade-ai-v4.vercel.app</a> in <code>#ai-shadematching</code> (<code>C091ZCS2CR3</code>) to drive volume. Watch the V4 dashboard daily and compare projection vs reality. Decide V4 → production after ~50 entries.</p>
+    </div>
+  </div>
+
+  <div class="next-step">
+    <div class="num">2</div>
+    <div class="pri p1">P1</div>
+    <div>
+      <h4>Confirm Foundation Stick shade mapping with product team</h4>
+      <p>The 8×3 lookup table in <code>src/lib/shade-data.ts</code> was built from <code>quiz-logic.html</code> and is marked provisional. Get Cheyenne or product to sign off before promoting V4 to production. The table is in the technical appendix below.</p>
+    </div>
+  </div>
+
+  <div class="next-step">
+    <div class="num">3</div>
+    <div class="pri p2">P2</div>
+    <div>
+      <h4>Watch for V4 over-correction</h4>
+      <p>The back-test assumes 15% of V3-correct skin-tone calls flip to "too dark" under V4. If real V4 data shows that drift is higher than expected, soften the "lean darker" override or add per-bucket guards. Group V4 entries by <code>skinToneDetected</code> in Redis to see which buckets over-shoot.</p>
+    </div>
+  </div>
+
+  <div class="next-step">
+    <div class="num">4</div>
+    <div class="pri p2">P2</div>
+    <div>
+      <h4>Pull more dark-tone Richpanel conversations</h4>
+      <p>Re-run <code>shade-matching-data/extract-cc-conversations.py</code> (timed out mid-run; progress JSON at <code>cc-extraction-progress.json</code>). Goal: dark-tone CX corpus from "thin" to "comparable to light/medium." Then add new few-shot examples for Med-Dark / Dark / Deep.</p>
+    </div>
+  </div>
+
+  <div class="next-step">
+    <div class="num">5</div>
+    <div class="pri p3">P3</div>
+    <div>
+      <h4>Promote V4 → production</h4>
+      <p>Once V4 accuracy is validated past ~70% skin tone (back-test projects 60%) and the Foundation Stick mapping is confirmed, deploy V4 code to the V1 Vercel project so customers see it on the production URL. Deploy recipe is in the technical appendix.</p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<hr class="divider" />
+
+<section id="tech" class="tech-section">
+  <div class="container">
+    <span class="section-label">Technical appendix</span>
+    <h2>7. For the engineer continuing the work</h2>
+    <p>Everything below is for whoever's hands are on the keyboard. Cody can skim.</p>
+
+    <h3>Tech stack</h3>
+    <table>
+      <thead><tr><th>Layer</th><th>Tech</th></tr></thead>
+      <tbody>
+        <tr><td>Framework</td><td>Next.js 16.2.1 + TypeScript (App Router) — note: this is breaking-change Next.js, see <code>AGENTS.md</code></td></tr>
+        <tr><td>Styling</td><td>Tailwind CSS 4</td></tr>
+        <tr><td>AI</td><td>Anthropic Claude Sonnet 4 Vision (<code>@anthropic-ai/sdk</code>)</td></tr>
+        <tr><td>Storage</td><td>Upstash Redis (<code>@upstash/redis</code>)</td></tr>
+        <tr><td>Hosting</td><td>Vercel (3 separate projects)</td></tr>
+        <tr><td>Dev server</td><td><code>npm run dev</code> → port 3000</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Repo layout</h3>
+    <pre><code>src/
+├── app/
+│   ├── page.tsx              # V3 main page: camera → results → inline feedback form
+│   ├── layout.tsx            # Root layout
+│   ├── globals.css
+│   ├── feedback/page.tsx     # Redirects to / (V3 no longer uses separate page)
+│   └── api/
+│       ├── match/route.ts    # POST: selfie → Claude Vision → shade recs (V3.1 system prompt)
+│       └── feedback/route.ts # POST/GET: save/retrieve from Redis
+├── components/
+│   ├── CameraCapture.tsx
+│   ├── AnalyzingState.tsx
+│   └── Results.tsx           # 3-tier Step 1 (JETM/WTF/Foundation Stick)
+└── lib/
+    ├── shade-data.ts         # Foundation Stick lookup, getComplexionShades(), MB recs
+    └── types.ts              # ShadeResult interface</code></pre>
+
+    <h3>Quick start</h3>
+    <pre><code>cd /Users/codyplofker/Desktop/01-Projects/jrb-shade-ai
+git checkout overnight/shade-ai-v3
+npm install
+npm run dev  # localhost:3000</code></pre>
+
+    <h4>Required env vars (in <code>.env.local</code>)</h4>
+    <ul>
+      <li><code>ANTHROPIC_API_KEY</code></li>
+      <li><code>UPSTASH_REDIS_REST_URL</code></li>
+      <li><code>UPSTASH_REDIS_REST_TOKEN</code></li>
+    </ul>
+
+    <h3>Four Vercel projects</h3>
+    <table>
+      <thead><tr><th>Version</th><th>Project name</th><th>Project ID</th></tr></thead>
+      <tbody>
+        <tr><td>V1</td><td><code>jrb-shade-ai</code></td><td><code>prj_1L6LhVDHTP7hJkCRQjxDi55MxHHm</code></td></tr>
+        <tr><td>V2</td><td><code>jrb-shade-ai-v2</code></td><td><code>prj_atq7j5fdJmKlwCWwIwJWjdUnT9yS</code></td></tr>
+        <tr><td>V3</td><td><code>jrb-shade-ai-v3</code></td><td><code>prj_x9EvRCnI1hd5pHyYcnfpaYXK8VHd</code></td></tr>
+        <tr><td>V4 🆕</td><td><code>jrb-shade-ai-v4</code></td><td><code>prj_31Npks5G0BvL5vTGsXOzEPsc3qiQ</code></td></tr>
+      </tbody>
+    </table>
+    <p><code>.vercel/project.json</code> currently points to V1. Org ID: <code>team_woE2wFm5eNRyL1G4ybV9Nsij</code>.</p>
+
+    <h4>Deploy to V4 (latest)</h4>
+    <pre><code>echo '{"projectId":"prj_31Npks5G0BvL5vTGsXOzEPsc3qiQ","orgId":"team_woE2wFm5eNRyL1G4ybV9Nsij","projectName":"jrb-shade-ai-v4"}' > .vercel/project.json
+echo '{"framework": "nextjs"}' > vercel.json
+vercel deploy --prod
+rm vercel.json
+echo '{"projectId":"prj_1L6LhVDHTP7hJkCRQjxDi55MxHHm","orgId":"team_woE2wFm5eNRyL1G4ybV9Nsij","projectName":"jrb-shade-ai"}' > .vercel/project.json</code></pre>
+
+    <h4>Deploy to V3</h4>
+    <pre><code>echo '{"projectId":"prj_x9EvRCnI1hd5pHyYcnfpaYXK8VHd","orgId":"team_woE2wFm5eNRyL1G4ybV9Nsij","projectName":"jrb-shade-ai-v3"}' > .vercel/project.json
+echo '{"framework": "nextjs"}' > vercel.json
+vercel deploy --prod
+rm vercel.json
+echo '{"projectId":"prj_1L6LhVDHTP7hJkCRQjxDi55MxHHm","orgId":"team_woE2wFm5eNRyL1G4ybV9Nsij","projectName":"jrb-shade-ai"}' > .vercel/project.json</code></pre>
+
+    <div class="callout">
+      <strong>Known issue</strong>
+      <p>V2/V3/V4 Vercel projects all have <code>framework: null</code> in project settings. Each deploy needs a temporary <code>vercel.json</code> with <code>{"framework": "nextjs"}</code>, otherwise build fails. Recipe above handles this. Could be permanently fixed by setting framework in Vercel dashboard.</p>
+    </div>
+
+    <h3>Foundation Stick lookup table (PROVISIONAL)</h3>
+    <p>From <code>quiz-logic.html</code>. Needs product team confirmation before promoting V3 → production.</p>
+    <table>
+      <thead><tr><th>Skin tone</th><th>Cool</th><th>Warm</th><th>Neutral</th></tr></thead>
+      <tbody>
+        <tr><td>Pale</td><td>Pale Alabaster</td><td>Bisque</td><td>Alabaster</td></tr>
+        <tr><td>Fair</td><td>Porcelain</td><td>Warm Linen</td><td>Neutral Fair</td></tr>
+        <tr><td>Light</td><td>Fair</td><td>Sand</td><td>Ivory</td></tr>
+        <tr><td>Light-Medium</td><td>Beige</td><td>Warm Beige</td><td>Neutral Beige</td></tr>
+        <tr><td>Medium</td><td>Medium</td><td>Warm Medium</td><td>Neutral Medium</td></tr>
+        <tr><td>Medium-Dark</td><td>Medium Honey</td><td>Warm Honey</td><td>Neutral Honey</td></tr>
+        <tr><td>Dark</td><td>Pecan</td><td>Golden</td><td>Hazelnut</td></tr>
+        <tr><td>Deep</td><td>Almond</td><td>Almond</td><td>Almond</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Training pipeline scripts</h3>
+    <p>All in <code>shade-matching-data/</code> (untracked from git intentionally — large data files).</p>
+    <table>
+      <thead><tr><th>Script</th><th>Purpose</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><code>extract-conversations.py</code></td><td>Pull Richpanel shade-tagged conversations</td><td>Complete</td></tr>
+        <tr><td><code>extract-cc-conversations.py</code></td><td>Pull CC-tagged conversations (different tag set)</td><td><span class="badge yellow">Timed out mid-run</span> — re-run with <code>cc-extraction-progress.json</code></td></tr>
+        <tr><td><code>cross-reference-richpanel-junip.py</code></td><td>Match conversations to Junip review outcomes</td><td>Complete (2,735 matches)</td></tr>
+        <tr><td><code>aggregate-training-data.py</code></td><td>Roll up shade distribution stats</td><td>Complete</td></tr>
+        <tr><td><code>build-training-dataset.py</code></td><td>Output JSONL for analysis / fine-tuning</td><td>Complete (<code>shade-training-data.jsonl</code> = 91MB)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Reading feedback from Redis</h3>
+    <pre><code># Total count
+curl -s https://jrb-shade-ai-v3.vercel.app/api/feedback | jq '.count'
+
+# V3-only entries
+curl -s https://jrb-shade-ai-v3.vercel.app/api/feedback | jq '[.feedback[] | select(.version == "v3")]'
+
+# Skin tone accuracy breakdown (V3)
+curl -s https://jrb-shade-ai-v3.vercel.app/api/feedback | jq '[.feedback[] | select(.version == "v3") | (.skinToneCorrect // "unset")] | group_by(.) | map({eval: .[0], count: length})'</code></pre>
+
+    <h3>Git state</h3>
+    <ul>
+      <li>Branch: <code>overnight/shade-ai-v3</code></li>
+      <li>Latest commit: <code>e12334d</code> (April 23 — added <code>version</code> + <code>recommendedFoundationStick</code> fields to feedback POST handler so local matches production)</li>
+      <li>Previous commit: <code>8233732</code> (April 12 — V3.1 Dark/Deep FP corrections + Octane AI few-shot)</li>
+      <li><code>shade-matching-data/</code> directory is untracked intentionally (large JSON dumps + Python scripts)</li>
+    </ul>
+
+    <h3>Key links</h3>
+    <ul>
+      <li>V4 live (latest): <a href="https://jrb-shade-ai-v4.vercel.app">jrb-shade-ai-v4.vercel.app</a></li>
+      <li>V3 live: <a href="https://jrb-shade-ai-v3.vercel.app">jrb-shade-ai-v3.vercel.app</a></li>
+      <li>V1 production: <a href="https://jrb-shade-ai.vercel.app">jrb-shade-ai.vercel.app</a></li>
+      <li>V4 dashboard: <code>~/Desktop/01-Projects/shade-feedback-dashboard-v4/index.html</code></li>
+      <li>GitHub: <a href="https://github.com/CodyPlofker/jrb-shade-ai">github.com/CodyPlofker/jrb-shade-ai</a></li>
+      <li>In-repo handover: <code>HANDOVER.md</code> (more verbose deploy detail)</li>
+      <li>Slack channel: <code>#ai-shadematching</code> (<code>C091ZCS2CR3</code>)</li>
+    </ul>
+  </div>
+</section>
+
+</body>
+</html>

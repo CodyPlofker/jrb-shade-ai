@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Shade Matching Tool — Team Brief</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: #1a1a1a;
+    line-height: 1.7;
+    background: #fff;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 100px;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 2px solid #000;
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+  }
+  .header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .header .subtitle {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 16px;
+  }
+  .header .meta {
+    display: flex;
+    gap: 24px;
+    font-size: 13px;
+    color: #888;
+  }
+  .header .meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* TOC */
+  .toc {
+    background: #f8f8f8;
+    border-radius: 8px;
+    padding: 24px 32px;
+    margin-bottom: 48px;
+  }
+  .toc h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 8px; }
+  .toc a { color: #000; text-decoration: none; font-weight: 500; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* Sections */
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-top: 24px;
+    border-top: 1px solid #e0e0e0;
+  }
+  h2:first-of-type { border-top: none; margin-top: 0; }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+
+  h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+
+  p { margin-bottom: 16px; font-size: 15px; }
+
+  /* Callouts */
+  .callout {
+    padding: 20px 24px;
+    border-radius: 8px;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+  .callout-blue { background: #eef4ff; border-left: 4px solid #3b82f6; }
+  .callout-green { background: #f0fdf4; border-left: 4px solid #22c55e; }
+  .callout-yellow { background: #fefce8; border-left: 4px solid #eab308; }
+  .callout-red { background: #fef2f2; border-left: 4px solid #ef4444; }
+  .callout strong { display: block; margin-bottom: 6px; }
+
+  /* Stats grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .stat-card {
+    background: #f8f8f8;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-card .number {
+    font-size: 28px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .stat-card .label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+  th {
+    background: #f8f8f8;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 2px solid #e0e0e0;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #555;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+  }
+  tr:hover td { background: #fafafa; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-yellow { background: #fef9c3; color: #854d0e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+
+  /* Flow diagram */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+    flex-wrap: wrap;
+    font-size: 14px;
+  }
+  .flow-step {
+    background: #f8f8f8;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-weight: 500;
+    text-align: center;
+  }
+  .flow-arrow { color: #ccc; font-size: 20px; }
+
+  /* Links */
+  a { color: #2563eb; }
+  a:hover { color: #1d4ed8; }
+
+  /* Lists */
+  ul, ol { margin-bottom: 16px; padding-left: 24px; font-size: 15px; }
+  li { margin-bottom: 8px; }
+
+  /* Quotes */
+  blockquote {
+    border-left: 3px solid #e0e0e0;
+    padding: 12px 20px;
+    margin: 16px 0;
+    font-style: italic;
+    color: #555;
+    background: #fafafa;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+  }
+  blockquote .attribution {
+    display: block;
+    font-style: normal;
+    font-weight: 600;
+    color: #333;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+
+  /* Version badges */
+  .version-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .version-tag {
+    background: #000;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .version-tag.v2 { background: #2563eb; }
+
+  /* Finding cards */
+  .finding {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 16px 0;
+  }
+  .finding-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .finding h4 { margin: 0; }
+  .finding p { margin-bottom: 8px; font-size: 14px; }
+  .finding .evidence { font-size: 13px; color: #666; }
+
+  /* HR */
+  hr { border: none; border-top: 1px solid #e0e0e0; margin: 48px 0; }
+
+  /* Next steps */
+  .next-step {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin: 12px 0;
+    align-items: flex-start;
+  }
+  .step-number {
+    background: #000;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* Print */
+  @media print {
+    body { max-width: 100%; padding: 20px; }
+    .callout { break-inside: avoid; }
+    table { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AI Shade Matching Tool</h1>
+  <p class="subtitle">V1 architecture, Junip review analysis, and proposed V2 improvements</p>
+  <div class="meta">
+    <span>March 31, 2026</span>
+    <span>For: CX + Shade Matching Team</span>
+    <span>From: Cody Plofker</span>
+  </div>
+</div>
+
+<nav class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#what-it-is">What the Tool Is</a></li>
+    <li><a href="#how-v1-works">How V1 Was Built</a></li>
+    <li><a href="#v1-accuracy">V1 Strengths and Weaknesses</a></li>
+    <li><a href="#junip-methodology">V2 Research: Junip Review Analysis</a></li>
+    <li><a href="#biggest-findings">Biggest Findings</a></li>
+    <li><a href="#proposals">Proposed V2 Changes</a></li>
+    <li><a href="#next-steps">Next Steps and Sign-Off</a></li>
+    <li><a href="#resources">Resources and Links</a></li>
+  </ol>
+</nav>
+
+<!-- ===== SECTION 1 ===== -->
+<h2 id="what-it-is">1. What the Tool Is</h2>
+
+<p>The AI Shade Matching Tool is a web app where a customer uploads a selfie and gets personalized shade recommendations across the JRB complexion line: What The Foundation, Face Pencil, Neutralizer, Miracle Balm, and Tinted Face Powder.</p>
+
+<div class="flow">
+  <div class="flow-step">Customer takes selfie</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-step">Claude Vision AI<br><small>analyzes skin tone + undertone</small></div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-step">Shade lookup tables<br><small>map tone to products</small></div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-step">Personalized recommendations</div>
+</div>
+
+<p>The AI classifies the selfie into one of <strong>8 skin tones</strong> (Pale, Fair, Light, Light-Medium, Medium, Medium-Dark, Dark, Deep) and one of <strong>3 undertones</strong> (Cool, Warm, Neutral). That combination then maps to specific shade recommendations for each product.</p>
+
+<div class="callout callout-blue">
+  <strong>Tech Stack</strong>
+  Next.js + TypeScript, deployed on Vercel. The AI model is Claude Sonnet 4 (Anthropic's vision model). Shade lookup data is stored in static TypeScript files. Feedback is collected via Upstash Redis.
+</div>
+
+<!-- ===== SECTION 2 ===== -->
+<h2 id="how-v1-works">2. How V1 Was Built</h2>
+
+<p>V1 was built in two layers, each from a different data source:</p>
+
+<h3>Layer 1: The System Prompt (from Richpanel CX Data)</h3>
+
+<p>The core AI instructions &mdash; what tells the model <em>how</em> to read a face and match it to a shade &mdash; were written from <strong>97+ real shade matching consultations</strong> pulled from the Richpanel CX ticketing system over 18 months (January 2025 &ndash; March 2026).</p>
+
+<p>These were actual customer conversations where someone emailed the JRB CX team with a selfie and an agent responded with shade recommendations. We extracted the patterns from these real expert recommendations:</p>
+
+<ul>
+  <li>How agents assess a bare-face selfie (jawline + forehead, compare face to neck)</li>
+  <li>The WTF shade anchors the entire recommendation &mdash; everything else maps from it</li>
+  <li>Edge cases: rosacea doesn't mean cool undertone, olive can be cool-olive or warm-olive, borderline cases lean lighter</li>
+  <li>Face Pencil under-eye is always 1-2 shades lighter than face</li>
+  <li>Lighting adjustments for warm/cool/fluorescent environments</li>
+</ul>
+
+<p>The consultations were organized into date-range batches and reviewed for consistent patterns:</p>
+
+<table>
+  <tr><th>Batch</th><th>Period</th><th>Consultations</th><th>Source</th></tr>
+  <tr><td>Batch 1-3</td><td>Jan &ndash; Mar 2025</td><td>~30</td><td>Richpanel CX tickets</td></tr>
+  <tr><td>Apr &ndash; Jun 2025</td><td>Q2 2025</td><td>~20</td><td>Richpanel CX tickets</td></tr>
+  <tr><td>Jul &ndash; Sep 2025</td><td>Q3 2025</td><td>~15</td><td>Richpanel CX tickets</td></tr>
+  <tr><td>Oct &ndash; Dec 2025</td><td>Q4 2025</td><td>~15</td><td>Richpanel CX tickets</td></tr>
+  <tr><td>Jan &ndash; Mar 2026</td><td>Q1 2026</td><td>~17 (119 identified)</td><td>Richpanel CX tickets</td></tr>
+  <tr><td>Dark Tones Search</td><td>Full 15 months</td><td><strong>0</strong></td><td>1,200+ tickets scanned</td></tr>
+</table>
+
+<h3>Layer 2: The Shade Lookup Tables (from Quiz Logic)</h3>
+
+<p>The product-specific mappings &mdash; which exact shade of Face Pencil or Miracle Balm to recommend for each skin tone &mdash; were built from two existing JRB quiz data sources:</p>
+
+<ul>
+  <li><strong>Miracle Balm Quiz</strong>: <a href="file:///Users/codyplofker/Desktop/01-Projects/jrb-miracle-balm-quiz/shade-recommendation-copy-table.csv">shade-recommendation-copy-table.csv</a> &mdash; maps each skin tone to MB shades by usage (Blush, Bronzer, Highlighter, Tint, Glow)</li>
+  <li><strong>Complexion Quiz</strong>: quiz-logic.csv &mdash; maps skin tone + undertone + coverage preference to WTF, JETM, Face Pencil, and Neutralizer recommendations</li>
+</ul>
+
+<p>These were the same logic tables that power the existing shade quizzes on jonesroadbeauty.com. The AI tool essentially combines CX expert judgment (how to read a face) with quiz logic (what to recommend).</p>
+
+<div class="callout callout-green">
+  <strong>How the two layers interact</strong>
+  The system prompt also contains a shade-to-product mapping table (from CX data) that acts as a cross-check. When Claude Vision says "Light-Medium, Warm," the prompt says "that maps to WTF Beige, Face Pencil 08-10, Neutralizer Light Peachy Pink" &mdash; and the lookup table in code confirms with exact product details.
+</div>
+
+<!-- ===== SECTION 3 ===== -->
+<h2 id="v1-accuracy">3. V1 Strengths and Weaknesses</h2>
+
+<h3>Where V1 is strong</h3>
+<ul>
+  <li><strong>Fair through Light-Medium skin</strong> &mdash; the bulk of CX training data. 97+ consultations, all in this range. The prompt has rich, nuanced rules for these tones.</li>
+  <li><strong>Undertone detection</strong> &mdash; rosacea handling, olive detection, warm vs cool indicators are well-documented in CX data.</li>
+  <li><strong>WTF recommendations</strong> &mdash; the core product mapping is battle-tested across hundreds of CX consults.</li>
+  <li><strong>Edge case rules</strong> &mdash; "lean lighter when in doubt," seasonal adjustments, face-vs-neck matching.</li>
+</ul>
+
+<h3>Where V1 is weak</h3>
+
+<div class="callout callout-red">
+  <strong>Critical: Zero dark-tone training data</strong>
+  We scanned 1,200+ Richpanel CX conversations across 15 months. We found <strong>zero completed shade matching consultations</strong> for Medium-Dark, Dark, or Deep skin tones. Not a single one. The darkest recommendation found in the entire dataset was Medium Honey (Face Pencil 10).
+</div>
+
+<p><strong>Why the gap exists:</strong></p>
+<ul>
+  <li>JRB's CX email channel skews overwhelmingly fair-to-medium (audience is 65+ and primarily lighter-skinned)</li>
+  <li>Darker-skinned customers may use the quiz, retail locations, or simply not reach out for shade help via email</li>
+  <li>The shade finder quiz funnels most customers before they email &mdash; those who email tend to be quiz failures, which skew light</li>
+</ul>
+
+<p><strong>What this means for V1:</strong> For Dark and Deep skin tones, the tool is essentially guessing based on the quiz logic tables, not validated by real CX expert consultations. The Miracle Balm recommendations for Dark/Deep also lack the nuanced "this shade reads too pink on deeper tones" guidance that exists for lighter shades.</p>
+
+<h3>Shade Finder Feedback (from Junip reviews)</h3>
+<p>534 Junip reviews explicitly mention the "shade finder" or "shade quiz":</p>
+
+<div class="stats-grid">
+  <div class="stat-card"><span class="number" style="color:#22c55e">68%</span><span class="label">Rated 5 stars</span></div>
+  <div class="stat-card"><span class="number" style="color:#eab308">10%</span><span class="label">Rated 3 stars</span></div>
+  <div class="stat-card"><span class="number" style="color:#ef4444">8%</span><span class="label">Rated 1-2 stars</span></div>
+  <div class="stat-card"><span class="number">534</span><span class="label">Total mentions</span></div>
+</div>
+
+<p>Top complaints from the 46 unhappy shade finder users: Bronze recommended but too orange, Flushed recommended but too pink, Au Naturel recommended but "gives no color" (expectation mismatch).</p>
+
+<!-- ===== SECTION 4 ===== -->
+<h2 id="junip-methodology">4. V2 Research: Junip Review Analysis</h2>
+
+<div class="version-header">
+  <span class="version-tag v2">V2 RESEARCH</span>
+  <span style="font-size: 14px; color: #666;">New data source to validate and improve shade logic</span>
+</div>
+
+<h3>The Idea</h3>
+<p>Junip collects a <strong>Skin Tone</strong> survey answer on every review (Fair, Light, Light-Medium, Medium, Medium-Dark, Dark, Deep). Each review is also tied to the exact product + shade the customer purchased, plus their rating and review text.</p>
+
+<p>That means we have real customers telling us: <em>"I have Light-Medium skin, I bought WTF Beige, and I rated it 5 stars."</em> Or: <em>"I have Dark skin, I bought Deep, and I rated it 1 star because it was too dark."</em></p>
+
+<p>This is ground truth data at a scale the CX tickets could never reach.</p>
+
+<h3>The Dataset</h3>
+
+<div class="stats-grid">
+  <div class="stat-card"><span class="number">381K</span><span class="label">Total Junip Reviews</span></div>
+  <div class="stat-card"><span class="number">201K</span><span class="label">Shade Product Reviews</span></div>
+  <div class="stat-card"><span class="number">35,903</span><span class="label">With Skin Tone Data</span></div>
+  <div class="stat-card"><span class="number">5,401</span><span class="label">With Customer Photos</span></div>
+</div>
+
+<table>
+  <tr><th>Self-Reported Skin Tone</th><th>Reviews (Shade Products)</th><th>% of Dataset</th></tr>
+  <tr><td>Light-Medium</td><td>12,189</td><td>33.9%</td></tr>
+  <tr><td>Light</td><td>9,887</td><td>27.5%</td></tr>
+  <tr><td>Fair</td><td>6,825</td><td>19.0%</td></tr>
+  <tr><td>Medium</td><td>6,101</td><td>17.0%</td></tr>
+  <tr><td>Medium-Dark</td><td>757</td><td>2.1%</td></tr>
+  <tr><td>Dark</td><td>118</td><td>0.3%</td></tr>
+  <tr><td>Deep</td><td>26</td><td>0.1%</td></tr>
+</table>
+
+<div class="callout callout-yellow">
+  <strong>Dark/Deep data is still limited but better than zero</strong>
+  The Richpanel CX data had 0 dark-tone consultations. Junip gives us 118 Dark + 26 Deep shade product reviews with self-reported skin tone. Still small, but with real purchase + satisfaction data for the first time.
+</div>
+
+<h3>How the Analysis Worked</h3>
+
+<h4>Step 1: Satisfaction Matrix</h4>
+<p>For every combination of (Skin Tone + Product + Shade), we calculated: number of reviews, average rating, percentage of 5-star reviews, percentage of 1-2 star reviews, and recommendation rate. This tells us which shade actually works for which skin tone.</p>
+
+<h4>Step 2: Text Mining for Shade Signals</h4>
+<p>We searched all 201K shade product review texts for specific language:</p>
+<ul>
+  <li><strong>Direction signals</strong>: "too dark" (found 1,000+), "too light" (found 1,200+), "too pink" (found 400+), "too orange" (found 200+)</li>
+  <li><strong>Correction signals</strong>: "exchanged for," "switched to," "should have gotten"</li>
+  <li><strong>Validation signals</strong>: "perfect match," "perfect shade," "spot on"</li>
+  <li><strong>Tool signals</strong>: "shade finder," "shade quiz" (534 mentions)</li>
+</ul>
+
+<h4>Step 3: Cross-Reference</h4>
+<p>Compared the review-validated recommendations (what shade happy customers with X skin tone actually bought) against the current tool's logic (what shade the tool would recommend for X skin tone). Where they diverge = improvement opportunity.</p>
+
+<!-- ===== SECTION 5 ===== -->
+<h2 id="biggest-findings">5. Biggest Findings</h2>
+
+<h3>High Priority &mdash; Clear Mismatches</h3>
+
+<div class="finding">
+  <div class="finding-header">
+    <h4>1. WTF for Dark Skin: Wrong Shade Recommended</h4>
+    <span class="badge badge-red">HIGH PRIORITY</span>
+  </div>
+  <p>Current tool maps Dark skin to "Rich" / shade 18+. Review data shows <strong>Almond (4.70 avg) and Cinnamon (4.86 avg)</strong> are the real winners. Deep has a 3.17 average with 33% low ratings.</p>
+  <p class="evidence">Evidence: 29 reviews from self-reported Dark skin customers. Almond = 70% 5-star, Cinnamon = 86% 5-star, Deep = 17% 5-star.</p>
+  <blockquote>"It is difficult to choose the correct color of foundations online. I chose the Deep Fonce Foundation which was too dark for my dark skin and did not complement my skin tone."
+    <span class="attribution">&mdash; Dark skin customer, WTF Deep, 1 star</span>
+  </blockquote>
+</div>
+
+<div class="finding">
+  <div class="finding-header">
+    <h4>2. Miracle Balm Happy Hour: Weak Across All Tones</h4>
+    <span class="badge badge-red">HIGH PRIORITY</span>
+  </div>
+  <p>Currently recommended as Highlighter for Pale and Fair. Happy Hour has <strong>24-26% low ratings across every skin tone</strong> &mdash; the weakest shade in the entire Miracle Balm range.</p>
+  <p class="evidence">Evidence: Fair = 25% low (n=294), Light = 26% low (n=453), Light-Medium = 24% low (n=466). By comparison, Miami Beach has 1-7% low ratings across all tones.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-header">
+    <h4>3. Miracle Balm Pinky Bronze: Too Dark for Fair/Light</h4>
+    <span class="badge badge-red">HIGH PRIORITY</span>
+  </div>
+  <p>Currently recommended as Bronzer for Fair. Pinky Bronze has <strong>116 "too dark" mentions</strong> across reviews, concentrated in Fair and Light-Medium customers.</p>
+  <p class="evidence">Evidence: 11 "too dark" mentions from Fair, 10 from Light, 28 from Light-Medium.</p>
+  <blockquote>"I have fair skin and like Dusty Rose Miracle Balm. Thought Pinky Bronze would bring a rose warmth but found it to be too Orange-Brown and look unnatural."
+    <span class="attribution">&mdash; Fair skin customer, Pinky Bronze, 1 star</span>
+  </blockquote>
+</div>
+
+<div class="finding">
+  <div class="finding-header">
+    <h4>4. Tinted Face Powder Dark: Bad for Medium-Dark</h4>
+    <span class="badge badge-red">HIGH PRIORITY</span>
+  </div>
+  <p>The Dark shade of Tinted Face Powder has <strong>40% low ratings from Medium-Dark customers</strong>. The Medium shade works dramatically better (4.69 avg, 0% low ratings).</p>
+  <p class="evidence">Evidence: n=5 for Dark (small sample but clear signal), n=13 for Medium (strong).</p>
+  <blockquote>"As a woman of color, we have various shades of skin. I found it difficult to find a tinted powder that fit my color... Maybe produce more shades for women of color."
+    <span class="attribution">&mdash; Medium skin customer, Tinted Face Powder Dark, 1 star</span>
+  </blockquote>
+</div>
+
+<h3>Medium Priority &mdash; Refinements</h3>
+
+<div class="finding">
+  <div class="finding-header">
+    <h4>5. Flushed is Polarizing (161 "Too Pink" Mentions)</h4>
+    <span class="badge badge-yellow">MEDIUM</span>
+  </div>
+  <p>Flushed is currently the primary Blush recommendation for Fair through Medium. It works well for many (4.48 avg for Fair) but has the <strong>most "too pink" complaints in the entire dataset</strong>. Especially problematic for warm undertones.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-header">
+    <h4>6. Miami Beach is Under-Recommended</h4>
+    <span class="badge badge-yellow">MEDIUM</span>
+  </div>
+  <p>Currently listed as just an "Alt" blush option. Miami Beach has <strong>79-94% five-star ratings across every skin tone</strong>. It's the single most universally loved shade in the MB range.</p>
+  <p class="evidence">Evidence: Fair=82% 5-star, Light=79%, Light-Medium=74%, Medium=83%, Medium-Dark=94%.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-header">
+    <h4>7. Face Pencil 01 Too Light for Fair Skin</h4>
+    <span class="badge badge-yellow">MEDIUM</span>
+  </div>
+  <p>70 "too light" mentions for Shade 01. Even Fair-skinned customers report it doesn't provide enough coverage. <strong>Shade 02 is the better default for Fair.</strong></p>
+  <blockquote>"Way too pale despite the quiz telling me to buy it! I have fair skin and red tones to my face, and shade 2 was perfect."
+    <span class="attribution">&mdash; Fair skin customer, Face Pencil Shade 01, 2 stars</span>
+  </blockquote>
+</div>
+
+<div class="finding">
+  <div class="finding-header">
+    <h4>8. Neutralizer: Medium Customers Prefer Going Lighter</h4>
+    <span class="badge badge-yellow">MEDIUM</span>
+  </div>
+  <p>Current tool recommends Medium Peachy Pink for Medium skin. But <strong>Light Peachy Pink (4.36 avg, n=83) outperforms Medium Peach (4.14 avg, n=71)</strong> with Medium-skinned customers.</p>
+</div>
+
+<h3>What's Confirmed Working Well</h3>
+
+<table>
+  <tr><th>Recommendation</th><th>Status</th><th>Evidence</th></tr>
+  <tr><td>WTF Beige for Light-Medium</td><td><span class="badge badge-green">CONFIRMED</span></td><td>2,966 reviews, 73% 5-star. Dominant choice.</td></tr>
+  <tr><td>WTF Fair for Fair skin</td><td><span class="badge badge-green">CONFIRMED</span></td><td>1,260 reviews, 77% 5-star.</td></tr>
+  <tr><td>WTF Medium Honey for Medium-Dark</td><td><span class="badge badge-green">CONFIRMED</span></td><td>93 reviews, 75% 5-star. Honey + Golden also strong.</td></tr>
+  <tr><td>Neutralizer Fair Pink for Fair</td><td><span class="badge badge-green">CONFIRMED</span></td><td>319 reviews, 73% 5-star.</td></tr>
+  <tr><td>Neutralizer Light Peachy Pink for Light-Medium</td><td><span class="badge badge-green">CONFIRMED</span></td><td>387 reviews, 68% 5-star.</td></tr>
+  <tr><td>Dusty Rose as All-Over Tint for Fair/Light</td><td><span class="badge badge-green">CONFIRMED</span></td><td>Top tint choice for Fair (n=604) and Light (n=876).</td></tr>
+</table>
+
+<!-- ===== SECTION 6 ===== -->
+<h2 id="proposals">6. Proposed V2 Changes</h2>
+
+<p>All changes would be made on a <strong>new branch</strong>, deployed to a separate Vercel preview URL. The current live tool stays untouched. We'd test the same selfies on both versions and compare outputs side-by-side before merging.</p>
+
+<h3>What changes</h3>
+
+<p>There are two files in the tool that control recommendations:</p>
+
+<table>
+  <tr><th>File</th><th>What It Does</th><th>What Changes</th></tr>
+  <tr>
+    <td><code>route.ts</code><br><small>System Prompt</small></td>
+    <td>Instructions to Claude Vision &mdash; how to read a face, shade mapping table, edge case rules</td>
+    <td>Add a "Review-Validated Corrections" section with the findings above. Additive &mdash; existing CX rules stay.</td>
+  </tr>
+  <tr>
+    <td><code>shade-data.ts</code><br><small>Lookup Tables</small></td>
+    <td>Hardcoded product recommendations per skin tone</td>
+    <td>Update specific shade defaults where review data shows a clear better option (e.g., Dark skin WTF mapping).</td>
+  </tr>
+</table>
+
+<h3>What does NOT change</h3>
+<ul>
+  <li>The AI vision model itself (Claude Sonnet 4) &mdash; no retraining</li>
+  <li>How selfies are captured or processed</li>
+  <li>The UI/UX of the results page</li>
+  <li>The feedback collection system</li>
+  <li>Any recommendation that the review data confirms is working</li>
+</ul>
+
+<h3>Specific proposed changes</h3>
+
+<table>
+  <tr><th>#</th><th>Current Logic</th><th>Proposed Change</th><th>Evidence</th></tr>
+  <tr>
+    <td>1</td>
+    <td>Dark skin &rarr; WTF "Rich" / shade 18+</td>
+    <td>Dark skin &rarr; WTF Almond or Cinnamon first</td>
+    <td>Almond 4.70 avg, Cinnamon 4.86 avg vs Deep 3.17</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>Pale/Fair Highlighter &rarr; Happy Hour</td>
+    <td>Replace with Magic Hour or Miami Beach</td>
+    <td>Happy Hour 24-26% low ratings across all tones</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Fair Bronzer &rarr; Pinky Bronze</td>
+    <td>Flag risk; suggest Bronze as safer alternative for Fair</td>
+    <td>116 "too dark" mentions for Pinky Bronze</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Medium-Dark Tinted Powder &rarr; Dark</td>
+    <td>Medium-Dark &rarr; Medium instead</td>
+    <td>Dark has 40% low, Medium has 0% low</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Flushed as primary Blush for all lighter tones</td>
+    <td>Add warning for warm undertones; elevate Miami Beach</td>
+    <td>161 "too pink" mentions; Miami Beach 79-94% 5-star</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>Fair Face Pencil &rarr; 05</td>
+    <td>Note that Shade 02 is safer if customer prefers more coverage</td>
+    <td>70 "too light" mentions for Shade 01</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>Medium Neutralizer &rarr; Medium Peachy Pink</td>
+    <td>Recommend Light Peachy Pink as primary for Medium</td>
+    <td>Light Peachy Pink 4.36 avg vs Medium Peach 4.14</td>
+  </tr>
+</table>
+
+<!-- ===== SECTION 7 ===== -->
+<h2 id="next-steps">7. Next Steps</h2>
+
+<div class="next-step">
+  <div class="step-number">1</div>
+  <div>
+    <strong>Team reviews this document and signs off on proposed changes</strong>
+    <p style="font-size:14px; color:#666; margin-top:4px;">CX team validates that the Junip findings match their experience. Shade matching team confirms the proposed corrections make sense. Flag anything that looks wrong.</p>
+  </div>
+</div>
+
+<div class="next-step">
+  <div class="step-number">2</div>
+  <div>
+    <strong>Create V2 branch and make changes</strong>
+    <p style="font-size:14px; color:#666; margin-top:4px;">New git branch. Update the system prompt and shade lookup tables with the 7 changes above. Deploy to a Vercel preview URL.</p>
+  </div>
+</div>
+
+<div class="next-step">
+  <div class="step-number">3</div>
+  <div>
+    <strong>Side-by-side testing</strong>
+    <p style="font-size:14px; color:#666; margin-top:4px;">Run the same set of selfies through V1 (current) and V2 (updated). Compare outputs. Especially test with Medium-Dark and Dark skin tone selfies to validate the new recommendations.</p>
+  </div>
+</div>
+
+<div class="next-step">
+  <div class="step-number">4</div>
+  <div>
+    <strong>CX team validates V2 outputs</strong>
+    <p style="font-size:14px; color:#666; margin-top:4px;">Shade matching experts review the V2 recommendations against their professional judgment. Are the new defaults better?</p>
+  </div>
+</div>
+
+<div class="next-step">
+  <div class="step-number">5</div>
+  <div>
+    <strong>Merge and deploy</strong>
+    <p style="font-size:14px; color:#666; margin-top:4px;">Once validated, merge V2 to main. Continue collecting feedback via the existing feedback form to monitor accuracy over time.</p>
+  </div>
+</div>
+
+<!-- ===== SECTION 8 ===== -->
+<h2 id="resources">8. Resources</h2>
+
+<table>
+  <tr><th>Resource</th><th>Location</th></tr>
+  <tr>
+    <td>Full Junip analysis (satisfaction matrix, mismatch signals, quotes)</td>
+    <td><a href="./junip-vs-current-logic.md">junip-vs-current-logic.md</a></td>
+  </tr>
+  <tr>
+    <td>Junip correction rules (JSON)</td>
+    <td><a href="./junip-corrections.json">junip-corrections.json</a></td>
+  </tr>
+  <tr>
+    <td>V1 System Prompt (current AI instructions)</td>
+    <td><a href="../src/app/api/match/route.ts">src/app/api/match/route.ts</a> &mdash; lines 14-97</td>
+  </tr>
+  <tr>
+    <td>V1 Shade Lookup Tables (current product mappings)</td>
+    <td><a href="../src/lib/shade-data.ts">src/lib/shade-data.ts</a></td>
+  </tr>
+  <tr>
+    <td>Miracle Balm Quiz Logic (original source for MB recs)</td>
+    <td><a href="/Users/codyplofker/Desktop/01-Projects/jrb-miracle-balm-quiz/shade-recommendation-copy-table.csv">shade-recommendation-copy-table.csv</a></td>
+  </tr>
+  <tr>
+    <td>Richpanel CX Data Batches (training data for V1)</td>
+    <td><a href="./">shade-matching-data/</a> &mdash; batch1.md through batch-dark-tones.md</td>
+  </tr>
+  <tr>
+    <td>Dark Tones Gap Analysis</td>
+    <td><a href="./batch-dark-tones.md">batch-dark-tones.md</a></td>
+  </tr>
+  <tr>
+    <td>Full Junip CSV Export (381K reviews)</td>
+    <td>review_export_7180.csv (ask Cody)</td>
+  </tr>
+</table>
+
+<hr>
+
+<p style="text-align:center; color:#888; font-size:13px; margin-top:40px;">
+  Generated March 31, 2026. Analysis based on 381,099 Junip reviews and 97+ Richpanel CX consultations.
+</p>
+
+</body>
+</html>

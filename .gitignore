@@ -39,3 +39,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# shade-matching-data: customer PII (Richpanel emails, selfie URLs, full names)
+shade-matching-data/batch*.md
+
+# shade-matching-data: raw customer data (Richpanel/Junip exports, training corpora)
+shade-matching-data/richpanel-*.json
+shade-matching-data/junip-shade-reviews-*.json
+shade-matching-data/junip-survey-data.json
+shade-matching-data/junip-corrections.json
+shade-matching-data/validated-training-data.json
+shade-matching-data/shade-training-data.jsonl
+shade-matching-data/shade-aggregated-stats.json
+shade-matching-data/extraction-progress.json
+shade-matching-data/cc-extraction-progress.json
+shade-matching-data/cc-tag-mapping.json

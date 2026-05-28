@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shade AI V4 — Early Read</title>
+<style>
+  @font-face {
+    font-family: 'Canela';
+    src: url('https://jrb-fonts-cdn.vercel.app/fonts/Canela-Light.otf') format('opentype');
+    font-weight: 300;
+  }
+  @font-face {
+    font-family: 'ArticulatCF';
+    src: url('https://jrb-fonts-cdn.vercel.app/fonts/ArticulatCF-Bold.otf') format('opentype');
+    font-weight: 700;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #000;
+    background: #fff;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 64px 32px; }
+  h1 {
+    font-family: 'Canela', Georgia, serif;
+    font-weight: 300;
+    font-size: 44px;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .meta {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 40px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  h2 {
+    font-family: 'ArticulatCF', -apple-system, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #000;
+  }
+  .headline {
+    background: #f8f8f8;
+    padding: 24px;
+    margin-bottom: 32px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .headline strong { font-weight: 700; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .card {
+    border: 1px solid #000;
+    padding: 20px;
+  }
+  .card .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #000;
+    margin-bottom: 8px;
+  }
+  .card .num {
+    font-family: 'Canela', Georgia, serif;
+    font-weight: 300;
+    font-size: 48px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .card .delta {
+    font-size: 13px;
+    color: #000;
+  }
+  .delta.up { color: #0a7d3a; font-weight: 700; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  th {
+    background: #f8f8f8;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .bar-cell { width: 200px; }
+  .bar {
+    height: 8px;
+    background: #f0f0f0;
+    position: relative;
+  }
+  .bar .fill { height: 100%; }
+  .fill.good { background: #0a7d3a; }
+  .fill.warn { background: #d97706; }
+  .fill.bad { background: #b91c1c; }
+  .fill.neutral { background: #888; }
+  .takeaway {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .takeaway::before {
+    content: "→  ";
+    color: #000;
+    font-weight: 700;
+  }
+  .next {
+    background: #f8f8f8;
+    padding: 16px 20px;
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .next strong { display: block; font-family: 'ArticulatCF', sans-serif; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; margin-bottom: 6px; }
+  @media (max-width: 600px) {
+    .wrap { padding: 40px 20px; }
+    h1 { font-size: 32px; }
+    .grid { grid-template-columns: 1fr; }
+    .bar-cell { width: 80px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Shade AI V4 — Early Read</h1>
+<p class="meta">April 23, 2026 · n=47 · ~7 hours post-launch</p>
+
+<div class="headline">
+  <strong>V4 ships better than V3 on both axes.</strong> Undertone accuracy beat the projection (+11 pts vs +4 projected); skin tone hit about half the projected lift (+9 pts vs +18). The "too light" pattern is essentially eliminated. New miss mode: model now over-corrects to "too dark" on Light/Light-Med customers and reads fair-pink faces as Neutral instead of Cool.
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="label">Skin tone correct</div>
+    <div class="num">51%</div>
+    <div class="delta up">+9 pts vs V3 (42%)</div>
+  </div>
+  <div class="card">
+    <div class="label">Undertone correct</div>
+    <div class="num">79%</div>
+    <div class="delta up">+11 pts vs V3 (68%)</div>
+  </div>
+</div>
+
+<h2>Skin tone breakdown (n=47)</h2>
+<table>
+  <thead><tr><th>Eval</th><th class="bar-cell"></th><th class="num">Count</th><th class="num">%</th></tr></thead>
+  <tbody>
+    <tr><td>Yes</td><td class="bar-cell"><div class="bar"><div class="fill good" style="width:51%;"></div></div></td><td class="num">24</td><td class="num">51%</td></tr>
+    <tr><td>Too Dark</td><td class="bar-cell"><div class="bar"><div class="fill warn" style="width:34%;"></div></div></td><td class="num">16</td><td class="num">34%</td></tr>
+    <tr><td>Way Off</td><td class="bar-cell"><div class="bar"><div class="fill bad" style="width:9%;"></div></div></td><td class="num">4</td><td class="num">9%</td></tr>
+    <tr><td>Too Light</td><td class="bar-cell"><div class="bar"><div class="fill neutral" style="width:6%;"></div></div></td><td class="num">3</td><td class="num">6%</td></tr>
+  </tbody>
+</table>
+
+<h2>Undertone breakdown (n=47)</h2>
+<table>
+  <thead><tr><th>Eval</th><th class="bar-cell"></th><th class="num">Count</th><th class="num">%</th></tr></thead>
+  <tbody>
+    <tr><td>Yes</td><td class="bar-cell"><div class="bar"><div class="fill good" style="width:79%;"></div></div></td><td class="num">37</td><td class="num">79%</td></tr>
+    <tr><td>Should be Cool</td><td class="bar-cell"><div class="bar"><div class="fill warn" style="width:15%;"></div></div></td><td class="num">7</td><td class="num">15%</td></tr>
+    <tr><td>Should be Neutral</td><td class="bar-cell"><div class="bar"><div class="fill neutral" style="width:4%;"></div></div></td><td class="num">2</td><td class="num">4%</td></tr>
+    <tr><td>Should be Warm</td><td class="bar-cell"><div class="bar"><div class="fill neutral" style="width:2%;"></div></div></td><td class="num">1</td><td class="num">2%</td></tr>
+  </tbody>
+</table>
+
+<h2>Three top-line takeaways</h2>
+<p class="takeaway"><strong>The fix worked.</strong> "Too Light" went from 35% (V3) to 6% (V4) — the prompt-contradiction patch and selfie-lighting compensation did what they were supposed to.</p>
+<p class="takeaway"><strong>Pendulum swung.</strong> 34% are now "Too Dark." Mostly Light / Light-Medium customers — the lean-darker override needs a softer touch on the lighter end of the spectrum.</p>
+<p class="takeaway"><strong>Cool faces reading Neutral.</strong> Stricter Neutral default helped overall (+11 pts undertone), but it's now mis-reading fair-pink Cool customers as Neutral.</p>
+
+<h2>By detected skin-tone bucket</h2>
+<table>
+  <thead><tr><th>Bucket</th><th class="num">n</th><th class="num">Skin ✓</th><th class="num">Too Dark</th><th class="num">Too Light</th><th class="num">Way Off</th><th class="num">Undertone ✓</th></tr></thead>
+  <tbody>
+    <tr><td>Light</td><td class="num">11</td><td class="num">54%</td><td class="num">36%</td><td class="num">0%</td><td class="num">9%</td><td class="num">54%</td></tr>
+    <tr><td>Light-Medium</td><td class="num">31</td><td class="num">51%</td><td class="num">39%</td><td class="num">0%</td><td class="num">10%</td><td class="num">83%</td></tr>
+    <tr><td>Medium</td><td class="num">4</td><td class="num">25%</td><td class="num">0%</td><td class="num">75%</td><td class="num">0%</td><td class="num">100%</td></tr>
+    <tr><td>Medium-Dark</td><td class="num">1</td><td class="num">100%</td><td class="num">0%</td><td class="num">0%</td><td class="num">0%</td><td class="num">100%</td></tr>
+    <tr><td>Dark / Deep</td><td class="num">0</td><td class="num" colspan="5" style="color:#888;">no data yet</td></tr>
+  </tbody>
+</table>
+<p class="takeaway"><strong>Light bucket is doing two things wrong at once.</strong> Skin-tone over-corrects dark (4/11) AND undertone misses Cool (4/11). One cluster of fair-pink customers is the V4 blind spot.</p>
+<p class="takeaway"><strong>Medium flipped the other way.</strong> Only n=4 but 3 of 4 are "Too Light." Lean-darker rule didn't reach Medium customers strongly enough.</p>
+
+<h2>By detected undertone — the smoking gun</h2>
+<table>
+  <thead><tr><th>Detected UT</th><th class="num">n</th><th class="num">% of all</th><th class="num">Skin ✓</th><th class="num">Too Dark</th><th class="num">Too Light</th></tr></thead>
+  <tbody>
+    <tr><td>Cool</td><td class="num">1</td><td class="num">2%</td><td class="num">100%</td><td class="num">0%</td><td class="num">0%</td></tr>
+    <tr><td><strong>Neutral</strong></td><td class="num"><strong>41</strong></td><td class="num"><strong>87%</strong></td><td class="num">53%</td><td class="num">37%</td><td class="num">0%</td></tr>
+    <tr><td>Warm</td><td class="num">5</td><td class="num">11%</td><td class="num">20%</td><td class="num">20%</td><td class="num">60%</td></tr>
+  </tbody>
+</table>
+<p class="takeaway"><strong>Model picks Neutral 87% of the time.</strong> Cool detection is essentially extinct (1/47). The stricter Neutral rule didn't just dampen Cool — it nuked it. This explains both the should-be-Cool misses AND why the lean-darker rule isn't reaching Warm-skewing Medium customers.</p>
+
+<h2>Numeric drift by bucket</h2>
+<p style="font-size:13px;color:#666;margin-bottom:12px;">Average gap between recommended FP shade midpoint and customer's actual shade. Positive = too dark, negative = too light.</p>
+<table>
+  <thead><tr><th>Bucket</th><th class="num">n shade-pairs</th><th class="num">Mean drift</th><th>Read</th></tr></thead>
+  <tbody>
+    <tr><td>Light</td><td class="num">15</td><td class="num" style="color:#b91c1c;">+2.3</td><td>~2 shades too dark</td></tr>
+    <tr><td>Light-Medium</td><td class="num">45</td><td class="num" style="color:#b91c1c;">+2.7</td><td>~3 shades too dark</td></tr>
+    <tr><td>Medium</td><td class="num">5</td><td class="num" style="color:#0a7d3a;">−2.5</td><td>~3 shades too LIGHT</td></tr>
+    <tr><td>Medium-Dark</td><td class="num">2</td><td class="num" style="color:#0a7d3a;">−5.5</td><td>wildly too light (small n)</td></tr>
+  </tbody>
+</table>
+<p class="takeaway"><strong>Lean-darker landed on Light/Light-Med (overshooting) but never reached Medium+ (undershooting).</strong> This is a bucket-targeting problem, not a global tuning problem.</p>
+
+<div class="next">
+  <strong>V4.1 candidate patches (refined)</strong>
+  (1) <strong>Conditional lean-darker by undertone:</strong> if detected as Neutral, soften +1.5 shades; if Warm, strengthen +1 shade. (2) <strong>Loosen Cool detection</strong> — currently picked 1/47. Add explicit "fair + visible pink + no warm hues = Cool, not Neutral" rule. (3) <strong>Suppress or recalibrate the confidence flag</strong> — it's currently inversely correlated with skin-tone accuracy. (4) <strong>Add Light × Cool worked example</strong> from Robin/Rayna/Kim/Jill miss patterns. (5) <strong>Push V4 in dark-tone CX channels</strong> — Dark/Deep buckets still have zero data after 47 entries.
+</div>
+
+<h2>Confidence × correctness — a counterintuitive finding</h2>
+<table>
+  <thead><tr><th>Self-reported confidence</th><th class="num">n</th><th class="num">Skin ✓</th><th class="num">Undertone ✓</th></tr></thead>
+  <tbody>
+    <tr><td>High</td><td class="num">18</td><td class="num" style="color:#b91c1c;">44%</td><td class="num">77%</td></tr>
+    <tr><td>Medium</td><td class="num">29</td><td class="num" style="color:#0a7d3a;">55%</td><td class="num">79%</td></tr>
+  </tbody>
+</table>
+<p class="takeaway"><strong>The model is more wrong when more sure on skin tone.</strong> High-confidence reads are correct 44% of the time vs 55% for medium-confidence. Undertone confidence is meaningless (~tied). Suggests the confidence signal is uncalibrated and shouldn't be surfaced to customers as-is. Could potentially flip it: low-confidence triggers a "try a different lighting" UX prompt.</p>
+
+<h2>Repeat users — proof it's the model, not the photo</h2>
+<table>
+  <thead><tr><th>User</th><th class="num">Submissions</th><th>Outcomes</th></tr></thead>
+  <tbody>
+    <tr><td>Mary Dees</td><td class="num">7</td><td>Too Dark × 7 (across all lighting conditions)</td></tr>
+    <tr><td>Susan</td><td class="num">3</td><td>Too Dark × 3</td></tr>
+    <tr><td>Kim</td><td class="num">2</td><td>Way Off, Yes (situational)</td></tr>
+  </tbody>
+</table>
+<p class="takeaway"><strong>When the same person gets the same wrong answer across lighting, it's the model.</strong> Mary Dees and Susan are systematic Light/Light-Med over-correction — they're the people the V4.1 patch needs to fix. Kim's split suggests V4 is photo-sensitive at the edges.</p>
+
+<h2>Detected undertone is a leading indicator of skin-tone error direction</h2>
+<table>
+  <thead><tr><th>Detected UT</th><th class="num">n</th><th class="num">Too Dark</th><th class="num">Too Light</th><th>Pattern</th></tr></thead>
+  <tbody>
+    <tr><td>Neutral</td><td class="num">41</td><td class="num" style="color:#b91c1c;">36%</td><td class="num">0%</td><td>always too dark, never too light</td></tr>
+    <tr><td>Warm</td><td class="num">5</td><td class="num">20%</td><td class="num" style="color:#0a7d3a;">60%</td><td>usually too light</td></tr>
+    <tr><td>Cool</td><td class="num">1</td><td class="num">0%</td><td class="num">0%</td><td>n too small</td></tr>
+  </tbody>
+</table>
+<p class="takeaway"><strong>Two completely different bias directions depending on undertone classification.</strong> Neutral-detected → skewing dark. Warm-detected → skewing light. Means the V4.1 fix shouldn't be a single global tuning — it should be conditional on undertone: lift Neutral lighter, push Warm darker.</p>
+
+<h2>Sentiment from notes (n=15 with notes)</h2>
+<p class="takeaway"><strong>11 positive, 4 corrective — roughly 3:1 in V4's favor.</strong> Standout positives: "the closest shade quiz!!! you did it!!" (Lorrie), "the most spot on yet" (Jamie), "got VERY close!!" (Laura), "Excellent!" (Rosemary). Corrective notes cluster on Light/Light-Med users with the over-dark pattern. The qualitative read matches the quantitative — V4 is genuinely better, just over-shooting one population.</p>
+
+<h2>Other slices worth running once we have more data</h2>
+<p class="takeaway"><strong>Lighting / context from notes.</strong> Many customers volunteer "indoor light," "afternoon window," "bathroom lighting." Tag entries by lighting context and see if the bias shifts. Hypothesis: the selfie-lighting comp is calibrated for flash/front-light but over-corrects in flat indoor light.</p>
+<p class="takeaway"><strong>Repeat user consistency.</strong> Mary Dees has 7 attempts across lighting conditions, all "Too Dark." Susan has 3, all "Too Dark." When the same person gets the same wrong answer across lighting, it's the model not the photo. Group entries by name to find systemic vs situational misses.</p>
+<p class="takeaway"><strong>Confidence × correctness.</strong> Claude returns a confidence score on each match. Plot confidence vs accuracy — if low-confidence reads are reliably wrong, we can surface a "we're not sure, try again with better light" UX path.</p>
+<p class="takeaway"><strong>Detected undertone × shade drift sign.</strong> Test the hypothesis that Warm-detected reads are systematically too-light and Neutral-detected reads are systematically too-dark. If true, the undertone classification itself is a leading indicator of skin-tone error and we can use it to triangulate.</p>
+<p class="takeaway"><strong>Self-reported ethnicity (when filled).</strong> When customers volunteer ethnicity in the form, group by that. Helps surface dark-tone gaps before we have submission volume.</p>
+<p class="takeaway"><strong>Notes sentiment cluster.</strong> Quick read on positive ("spot on!" "the closest yet!") vs corrective ("still needs work"). Tells us which buckets feel the AI is "almost there" vs "not even close" — different patches for each.</p>
+
+</div>
+</body>
+</html>

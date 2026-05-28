@@ -1,0 +1,2989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shade AI V4 — Feedback Summary + Raw Responses</title>
+<style>
+  @font-face { font-family:'Canela'; src:url('https://jrb-fonts-cdn.vercel.app/fonts/Canela-Light.otf') format('opentype'); font-weight:300; }
+  @font-face { font-family:'ArticulatCF'; src:url('https://jrb-fonts-cdn.vercel.app/fonts/ArticulatCF-Bold.otf') format('opentype'); font-weight:700; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#000;background:#fff;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto;padding:48px 24px}
+  h1{font-family:'Canela',Georgia,serif;font-weight:300;font-size:42px;line-height:1.05;margin-bottom:8px}
+  .meta{font-size:11px;color:#666;letter-spacing:.5px;text-transform:uppercase;margin-bottom:28px}
+  h2{font-family:'ArticulatCF',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px;margin:36px 0 12px;padding-bottom:8px;border-bottom:1px solid #000}
+  .headline{background:#f8f8f8;padding:20px 24px;font-size:15px;line-height:1.6;margin-bottom:20px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px}
+  @media(max-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
+  .card{border:1px solid #000;padding:16px}
+  .card .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#000;margin-bottom:6px}
+  .card .num{font-family:'Canela',Georgia,serif;font-weight:300;font-size:38px;line-height:1}
+  .card .delta{font-size:12px;margin-top:4px}
+  .delta.up{color:#0a7d3a;font-weight:700}
+  .delta.down{color:#b91c1c;font-weight:700}
+  table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #e5e5e5}
+  th{background:#f8f8f8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .takeaway{font-size:14px;line-height:1.6;margin-bottom:8px}
+  .takeaway::before{content:"\2192  ";font-weight:700}
+  .filters{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;position:sticky;top:0;background:#fff;padding:8px 0;z-index:10;border-bottom:1px solid #eee}
+  .filter-btn{padding:5px 12px;border:1px solid #000;background:#fff;color:#000;font-size:12px;cursor:pointer;border-radius:20px;font-family:inherit}
+  .filter-btn.active{background:#000;color:#fff}
+  .entry{border:1px solid #e5e5e5;border-radius:6px;margin-bottom:8px;overflow:hidden;background:#fff}
+  .entry summary{padding:12px 14px;cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:8px;list-style:none;font-size:13px}
+  .entry summary::-webkit-details-marker{display:none}
+  .entry summary::after{content:"\25BE";color:#888;margin-left:auto;font-size:11px}
+  .entry[open] summary::after{content:"\25B4"}
+  .entry[open] summary{border-bottom:1px solid #eee}
+  .ename{font-weight:700;font-size:13px;min-width:130px}
+  .meta-row{display:flex;flex-wrap:wrap;gap:4px;flex:1}
+  .pill{display:inline-block;padding:2px 9px;border-radius:18px;font-size:11px;border:1px solid;white-space:nowrap}
+  .pill-correct{background:#e6f5ec;color:#0a7d3a;border-color:#a4d8b6}
+  .pill-wrong{background:#fdecea;color:#b91c1c;border-color:#f3b4ac}
+  .pill-partial{background:#fdf3dd;color:#a06000;border-color:#e9c06b}
+  .pill-neutral{background:#f0f0f0;color:#444;border-color:#d4d4d4}
+  .date{font-size:11px;color:#999;margin-left:auto}
+  .detail{padding:14px;background:#fafafa}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:640px){.detail-grid{grid-template-columns:1fr}}
+  .detail h4{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#666;margin-bottom:8px}
+  .dr{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee;gap:10px}
+  .dr span{color:#666;flex-shrink:0}
+  .dr b{color:#000;font-weight:600;text-align:right;word-break:break-word}
+  .notes{margin-top:10px;padding:10px 12px;background:#fff;border:1px solid #eee;border-radius:4px;font-size:12px;line-height:1.55;color:#333}
+  .notes strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:4px}
+  .quotes{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+  @media(max-width:640px){.quotes{grid-template-columns:1fr}}
+  .quote-col h4{font-family:'ArticulatCF',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+  .quote-col.pos h4{color:#0a7d3a}
+  .quote-col.neg h4{color:#b91c1c}
+  .quote{font-size:12px;line-height:1.55;padding:8px 10px;background:#f8f8f8;margin-bottom:6px;border-left:3px solid #ccc}
+  .quote.pos{border-color:#0a7d3a}
+  .quote.neg{border-color:#b91c1c}
+  .quote .who{display:block;font-size:10px;color:#666;margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Shade AI V4 — Feedback Summary + Raw Responses</h1>
+<p class="meta">Generated May 15, 2026 at 9:20 AM · n=87 V4 · V3 baseline n=66</p>
+<div class="headline">
+<strong>V4 still ships better than V3 on both axes.</strong> Skin-tone correct 47% (V3 42%, +5 pts). Undertone correct 77% (V3 68%, +9 pts). "Too Dark" misses (25%) now outpace "Too Light" (21%) — opposite of V3's blind spot, confirming the lean-darker patch over-corrected on lighter customers.
+</div>
+<div class="grid">
+<div class="card"><div class="lbl">V4 responses</div><div class="num">87</div></div>
+<div class="card"><div class="lbl">Skin tone correct</div><div class="num">47%</div><div class="delta up">+5 pts vs V3</div></div>
+<div class="card"><div class="lbl">Undertone correct</div><div class="num">77%</div><div class="delta up">+9 pts vs V3</div></div>
+<div class="card"><div class="lbl">With shade data</div><div class="num">84</div></div>
+</div>
+<h2>Skin-tone breakdown</h2>
+<table><thead><tr><th>Eval</th><th class="num">Count</th><th class="num">%</th></tr></thead><tbody>
+<tr><td>Yes</td><td class="num">41</td><td class="num">47%</td></tr>
+<tr><td>Too Dark</td><td class="num">22</td><td class="num">25%</td></tr>
+<tr><td>Too Light</td><td class="num">18</td><td class="num">21%</td></tr>
+<tr><td>Way Off</td><td class="num">6</td><td class="num">7%</td></tr>
+</tbody></table>
+<h2>Undertone breakdown</h2>
+<table><thead><tr><th>Eval</th><th class="num">Count</th><th class="num">%</th></tr></thead><tbody>
+<tr><td>Yes</td><td class="num">67</td><td class="num">77%</td></tr>
+<tr><td>Should be Cool</td><td class="num">9</td><td class="num">10%</td></tr>
+<tr><td>Should be Neutral</td><td class="num">6</td><td class="num">7%</td></tr>
+<tr><td>Should be Warm</td><td class="num">5</td><td class="num">6%</td></tr>
+</tbody></table>
+<h2>By detected skin-tone bucket</h2>
+<table><thead><tr><th>Bucket</th><th class="num">n</th><th class="num">Skin ✓</th><th class="num">UT ✓</th><th class="num">Too Dark</th><th class="num">Too Light</th><th class="num">Way Off</th></tr></thead><tbody>
+<tr><td>Light-Medium</td><td class="num">53</td><td class="num">53%</td><td class="num">77%</td><td class="num">16</td><td class="num">4</td><td class="num">5</td></tr>
+<tr><td>Light</td><td class="num">16</td><td class="num">50%</td><td class="num">69%</td><td class="num">5</td><td class="num">2</td><td class="num">1</td></tr>
+<tr><td>Medium</td><td class="num">8</td><td class="num">25%</td><td class="num">75%</td><td class="num">0</td><td class="num">6</td><td class="num">0</td></tr>
+<tr><td>Medium-Dark</td><td class="num">5</td><td class="num">20%</td><td class="num">100%</td><td class="num">0</td><td class="num">4</td><td class="num">0</td></tr>
+<tr><td>Fair</td><td class="num">2</td><td class="num">50%</td><td class="num">100%</td><td class="num">1</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Dark</td><td class="num">2</td><td class="num">0%</td><td class="num">100%</td><td class="num">0</td><td class="num">2</td><td class="num">0</td></tr>
+<tr><td>Deep</td><td class="num">1</td><td class="num">100%</td><td class="num">0%</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+</tbody></table>
+<h2>By detected undertone</h2>
+<table><thead><tr><th>Bucket</th><th class="num">n</th><th class="num">Skin ✓</th><th class="num">UT ✓</th><th class="num">Too Dark</th><th class="num">Too Light</th><th class="num">Way Off</th></tr></thead><tbody>
+<tr><td>Neutral</td><td class="num">66</td><td class="num">53%</td><td class="num">80%</td><td class="num">19</td><td class="num">6</td><td class="num">6</td></tr>
+<tr><td>Warm</td><td class="num">18</td><td class="num">22%</td><td class="num">67%</td><td class="num">2</td><td class="num">12</td><td class="num">0</td></tr>
+<tr><td>Cool</td><td class="num">3</td><td class="num">67%</td><td class="num">67%</td><td class="num">1</td><td class="num">0</td><td class="num">0</td></tr>
+</tbody></table>
+<h2>By self-reported confidence</h2>
+<table><thead><tr><th>Confidence</th><th class="num">n</th><th class="num">Skin ✓</th><th class="num">UT ✓</th></tr></thead><tbody>
+<tr><td>high</td><td class="num">44</td><td class="num">39%</td><td class="num">73%</td></tr>
+<tr><td>medium</td><td class="num">43</td><td class="num">56%</td><td class="num">81%</td></tr>
+</tbody></table>
+<p class="takeaway"><strong>Confidence is still uncalibrated.</strong> High-confidence reads aren't materially more accurate than medium — surfacing the score to customers as-is is risky.</p>
+<h2>Notes — sample positive vs corrective</h2>
+<div class="quotes">
+<div class="quote-col pos">
+<h4>Positive (15)</h4>
+<div class="quote pos"><span class="who">Rhonda Battenfelder</span>This was excellent! The first attempt that didn’t send through was a little off, but I realized the visor was down in the car so it made my skin appear darker than it is in real life. I tried to submit that attempt, so I apologize it didn’t go through. Once I realized everything was too dark, I put the visor up and retook my photo. The results were great! The Miracle Balm shades suggested work for me, but they are not my favorite shades. All of the color matching worked perfectly! Thank you!</div>
+<div class="quote pos"><span class="who">Margaret Koenig</span>This version with high confidence showed a warm undertone. Previous attempt with medium confidence showed a neutral undertone. I think warm is more accurate. Face pencil was off by one in this iteration, but accurate in the previous try</div>
+<div class="quote pos"><span class="who">Jo</span>Love this tool!</div>
+<div class="quote pos"><span class="who">Wendy D</span>This version was pretty much spot on with everything that I use! Way to go JR team!</div>
+<div class="quote pos"><span class="who">Tanya</span>This was spot on after visiting the Chicago store and being matched in person!  The only exception is in the store, Miami Beach was recommended as a blusher.</div>
+</div>
+<div class="quote-col neg">
+<h4>Corrective (21)</h4>
+<div class="quote neg"><span class="who">Samantha</span>It&#x27;s possible some of the recommendations were incorrect based on the lighting in the photo. I can submit another at a later time to see if the recommendations differ.</div>
+<div class="quote neg"><span class="who">Dustin Svatek</span>Stood at window Close to natural light.  Slightly overcast. When I matched myself I was Neutral fair to the stock. I am usually more neutral but lean towards cool</div>
+<div class="quote neg"><span class="who">Fariza Rusdi</span>Good colors just 1 shade too light in complexion products.</div>
+<div class="quote neg"><span class="who">Danielle Freda</span>I&#x27;ve done this in all kinds of lighting. I was always told I was warm complected not neutral.. maybe try again..but this is the closest match of all so far. The foundation is a bit off..</div>
+<div class="quote neg"><span class="who">Eden S</span>Same photo I’ve been using for all the tests</div>
+</div>
+</div>
+<h2>Repeat users</h2>
+<table><thead><tr><th>Name</th><th class="num">Submissions</th></tr></thead><tbody>
+<tr><td>Mary Dees</td><td class="num">7</td></tr>
+<tr><td>Emily</td><td class="num">4</td></tr>
+<tr><td>Susan</td><td class="num">3</td></tr>
+<tr><td>Kim</td><td class="num">2</td></tr>
+<tr><td>Tanya</td><td class="num">2</td></tr>
+</tbody></table>
+<h2>All V4 responses (newest first, n=87)</h2>
+<div class="filters">
+<button class="filter-btn active" data-f="all">All (87)</button>
+<button class="filter-btn" data-f="skin-yes">Skin ✓</button>
+<button class="filter-btn" data-f="skin-too-dark">Too Dark</button>
+<button class="filter-btn" data-f="skin-too-light">Too Light</button>
+<button class="filter-btn" data-f="skin-way-off">Way Off</button>
+<button class="filter-btn" data-f="ut-no">Undertone wrong</button>
+<button class="filter-btn" data-f="notes">Has notes</button>
+</div>
+<div id="entries">
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Emily</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">may 15, 5:10am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Pinky Bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige or Light</b></div>
+<div class="dr"><span>Actual FP</span><b>08-10</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see you have a lovely light-medium complexion with balanced neutral undertones - no strong pink or yellow cast. The warm indoor lighting is making your skin appear slightly more golden than it likely is in natural light, but your undertone reads as beautifully balanced. Your complexion has that healthy, even tone that works perfectly with neutral-based shades.</div>
+<div class="notes"><strong>Tester Notes</strong>Pulling a little bit dark on the complexion recommendations, but the recommended shade is my summer shade, so it’s not far off. YSFS rec is darker than I wear</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="should-be-warm" data-notes="0">
+<summary>
+<span class="ename">Romaine Harris</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-wrong">✗ UT: Should be Warm</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 12, 9:16am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Deep</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Cheeky, Bronzer: Cocoa Bronze, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Cinnamon</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 23-25, Eye: 21-23</b></div>
+<div class="dr"><span>Rec FS</span><b>Almond</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Warm</b></div>
+<div class="dr"><span>Actual MB</span><b>Cocoa bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Deep</b></div>
+<div class="dr"><span>Actual FP</span><b>23</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a beautiful deep complexion with clear warm golden undertones throughout the face and neck area. The skin has a rich, warm brown tone with golden highlights that are particularly visible on the forehead and cheekbones. The lighting appears natural and even, giving me a clear view of the true skin tone without washing out or distorting the color.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Samantha</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">may 8, 11:19am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Chic, Cocoa Bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Alabaster</b></div>
+<div class="dr"><span>Actual FP</span><b>Shade 01</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the visible areas around your glasses, I can see you have light skin with a balanced, neutral undertone - no strong pink or yellow cast. The indoor lighting with that warm yellow wall behind you might be adding some warmth to the photo, but your natural skin tone appears beautifully neutral. Your complexion looks smooth and even-toned.</div>
+<div class="notes"><strong>Tester Notes</strong>It&#x27;s possible some of the recommendations were incorrect based on the lighting in the photo. I can submit another at a later time to see if the recommendations differ.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Kaitlyn</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 8, 11:09am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Cocoa Bronze, Cheeky, Golden Hour, Bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Medium Honey </b></div>
+<div class="dr"><span>Actual FP</span><b>14 and 15</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see you have a beautiful light-medium complexion with balanced undertones - no strong pink or yellow cast, which indicates neutral. Your skin has a healthy, even tone with some natural warmth but not enough to classify as warm undertone. The lighting in this photo is great for shade matching, and I can clearly see the consistency between your face and neck.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Ally Voris</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">Caucasian</span>
+</span>
+<span class="date">may 6, 12:59pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Pinched Cheeks, Sunkissed</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>09</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see clear, natural lighting from the window that shows your true skin tone well. Your jawline and neck area show a balanced, neutral undertone without strong pink or yellow casts. There&#x27;s some natural rosiness in your cheeks, but this appears to be circulation rather than a cool undertone indicator. Your overall complexion has that classic light, neutral tone that works beautifully with versatile shades.</div>
+</div></details>
+<details class="entry" data-skin="way-off" data-ut="should-be-cool" data-notes="1">
+<summary>
+<span class="ename">Dustin Svatek</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Way Off</span>
+<span class="pill pill-wrong">✗ UT: Should be Cool</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">Caucasian </span>
+</span>
+<span class="date">may 6, 12:45pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Way Off</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Cool</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty Rose, pinched cheeks, pinky Bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Porcelain</b></div>
+<div class="dr"><span>Actual FP</span><b>Pencil 5</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the even tone across your face, I can see a balanced Light-Medium complexion without any strong pink or yellow cast. The lighting is clear and shows your natural skin tone well. Your undertone appears neutral - not pulling distinctly cool or warm, which will give you lots of versatility with product choices.</div>
+<div class="notes"><strong>Tester Notes</strong>Stood at window Close to natural light.  Slightly overcast. When I matched myself I was Neutral fair to the stock. I am usually more neutral but lean towards cool</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="should-be-warm" data-notes="1">
+<summary>
+<span class="ename">Fariza Rusdi</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-wrong">✗ UT: Should be Warm</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 6, 9:32am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-11, Eye: 07-09</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Warm</b></div>
+<div class="dr"><span>Actual MB</span><b>Flushed, Miami Beach, Sunkissed</b></div>
+<div class="dr"><span>Actual WTF</span><b>Medium</b></div>
+<div class="dr"><span>Actual FP</span><b>13</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a beautiful light-medium complexion with clear warm undertones. There&#x27;s a lovely golden cast to your skin, especially visible along your jawline and the natural shadows of your face. Your skin has that healthy warmth that pairs perfectly with warm-toned shades rather than cool pinks.</div>
+<div class="notes"><strong>Tester Notes</strong>Good colors just 1 shade too light in complexion products.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Kristi</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 6, 8:26am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium-Dark</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Pinched Cheeks, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium Honey</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 13-15, Eye: 11-13</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Honey</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>—</b></div>
+<div class="dr"><span>Actual WTF</span><b>Golden</b></div>
+<div class="dr"><span>Actual FP</span><b>19</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the visible areas of your neck, I can see a beautiful medium-dark complexion with clear warm golden undertones. The warmth is evident in the golden cast along your jawline and the peachy-warm tone in your cheeks. Your skin has that lovely depth and richness that works beautifully with warm-toned products.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Tomeke</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 6, 8:24am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium-Dark</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Pinched Cheeks, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium Honey</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 13-15, Eye: 11-13</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Honey</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed</b></div>
+<div class="dr"><span>Actual WTF</span><b>Golden</b></div>
+<div class="dr"><span>Actual FP</span><b>19</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the areas where the foundation isn&#x27;t applied, I can see you have a beautiful medium-dark complexion with warm golden undertones. The natural warmth in your skin is evident in the golden cast along your jawline and neck area. Your complexion has that lovely depth and richness that works beautifully with warm-toned products.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Tracy</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 6, 8:22am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Dark</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Cheeky, Bronzer: Cocoa Bronze, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Almond</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 19-21, Eye: 17-19</b></div>
+<div class="dr"><span>Rec FS</span><b>Golden</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>—</b></div>
+<div class="dr"><span>Actual WTF</span><b>Deep</b></div>
+<div class="dr"><span>Actual FP</span><b>24</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see beautiful dark skin with a clear warm, golden undertone throughout the face and neck area. The jawline and cheek areas show consistent warmth with golden-yellow undertones rather than cool or ashy tones. The lighting appears even and natural, giving me a clear view of the true skin tone which has lovely depth and richness with warm golden notes.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="should-be-neutral" data-notes="0">
+<summary>
+<span class="ename">Yumi</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-wrong">✗ UT: Should be Neutral</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 6, 7:51am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-11, Eye: 07-09</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Neutral</b></div>
+<div class="dr"><span>Actual MB</span><b>—</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>3</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see clear warm yellow undertones throughout the jawline and neck area, with a golden cast that&#x27;s consistent across the face. The skin depth appears to be light-medium rather than just light, and there&#x27;s no pink or cool cast visible. The even lighting and clear photo quality make this assessment confident.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="should-be-neutral" data-notes="0">
+<summary>
+<span class="ename">Marissa</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-wrong">✗ UT: Should be Neutral</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 5, 9:35am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Tawny, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-12, Eye: 08-10</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Medium</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Neutral</b></div>
+<div class="dr"><span>Actual MB</span><b>—</b></div>
+<div class="dr"><span>Actual WTF</span><b>Medium Honey</b></div>
+<div class="dr"><span>Actual FP</span><b>13</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a beautiful medium-depth complexion with clear warm golden undertones. The warm cast is particularly visible along your jawline and the way the light hits your skin. Your complexion has that lovely golden warmth that works beautifully with our Medium shade range.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Jonelle</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 5, 9:33am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Tawny, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-12, Eye: 08-10</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Medium</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed</b></div>
+<div class="dr"><span>Actual WTF</span><b>Golden</b></div>
+<div class="dr"><span>Actual FP</span><b>18</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>You have beautiful medium-toned skin with clear warm undertones visible in the golden cast along your jawline and cheeks. Your complexion has that lovely warmth that pairs perfectly with our Medium shade range, and I can see the golden undertones that make warm-toned products ideal for you.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Patricia</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 5, 9:31am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Tawny, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-12, Eye: 08-10</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Medium</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed</b></div>
+<div class="dr"><span>Actual WTF</span><b>Honey</b></div>
+<div class="dr"><span>Actual FP</span><b>18</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a beautiful medium-toned complexion with clear warm golden undertones throughout the face and neck area. The skin has that lovely golden warmth that&#x27;s consistent from the forehead down to the jawline, and there&#x27;s no pink or cool cast visible. The lighting appears even and natural, giving me a clear view of your true skin tone.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="should-be-neutral" data-notes="0">
+<summary>
+<span class="ename">Hetal</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-wrong">✗ UT: Should be Neutral</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 5, 9:30am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Tawny, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-12, Eye: 08-10</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Medium</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Neutral</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed or Tawny</b></div>
+<div class="dr"><span>Actual WTF</span><b>Medium Honey</b></div>
+<div class="dr"><span>Actual FP</span><b>17</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a beautiful medium-depth complexion with a clear warm, golden undertone throughout the jawline and neck area. The skin has that lovely honeyed warmth that&#x27;s characteristic of warm undertones, and there&#x27;s good natural lighting that shows the true depth of your skin tone. Your complexion appears to have that rich, golden cast that works beautifully with warm-toned shades.</div>
+</div></details>
+<details class="entry" data-skin="way-off" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Romilly</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Way Off</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+</span>
+<span class="date">may 5, 9:17am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Way Off</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Chic</b></div>
+<div class="dr"><span>Actual WTF</span><b>Porcelain</b></div>
+<div class="dr"><span>Actual FP</span><b>1</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a balanced complexion with no strong pink or yellow cast along the jawline and forehead. The skin appears to be in the light-medium range with neutral undertones - there&#x27;s no obvious cool pink or warm golden cast. The lighting appears to be front-facing which may be washing out some depth, so I&#x27;m leaning toward the deeper end of this classification following V4 guidelines.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Kayal</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 5, 9:01am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium-Dark</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Pinched Cheeks, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium Honey</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 13-15, Eye: 11-13</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Honey</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed</b></div>
+<div class="dr"><span>Actual WTF</span><b>Golden</b></div>
+<div class="dr"><span>Actual FP</span><b>19</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a beautiful medium-dark complexion with clear warm golden undertones, especially visible along the jawline and cheekbones. The skin has a lovely golden glow and warmth that indicates warm undertones rather than cool or neutral. The lighting appears even and natural, giving me a clear view of the true skin tone depth and undertone.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Maya</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 5, 8:59am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium-Dark</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Pinched Cheeks, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium Honey</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 13-15, Eye: 11-13</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Honey</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed</b></div>
+<div class="dr"><span>Actual WTF</span><b>Golden</b></div>
+<div class="dr"><span>Actual FP</span><b>18</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your beautiful complexion, I can see a rich medium-dark skin tone with warm golden undertones throughout your face and neck area. The lighting appears even and natural, giving me a clear view of your skin&#x27;s true depth and warmth. Your jawline and forehead show consistent medium-dark tones with that lovely golden cast that indicates warm undertones.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Oumy</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">may 5, 8:57am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Dark</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Cheeky, Bronzer: Cocoa Bronze, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Almond</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 19-21, Eye: 17-19</b></div>
+<div class="dr"><span>Rec FS</span><b>Hazelnut</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Cheeky or Cocoa Bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Deep</b></div>
+<div class="dr"><span>Actual FP</span><b>23</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>You have a beautiful deep complexion with rich, even tone throughout your face and neck. Your skin shows a balanced neutral undertone without strong warm golden or cool ashy casts - it has that lovely natural depth that looks harmonious across your jawline and forehead. The lighting in this photo is excellent for shade matching, giving me a clear view of your true skin tone.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Cheyenne</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">may 5, 8:51am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>—</b></div>
+<div class="dr"><span>Actual WTF</span><b>—</b></div>
+<div class="dr"><span>Actual FP</span><b>—</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a lovely light-medium complexion with balanced neutral undertones - you don&#x27;t have a strong pink or yellow cast, which is perfect for neutral classification. The indoor lighting is creating some brightness on your face, but your neck and the shadow areas show your true depth. I notice some natural rosiness in your cheeks, but this appears to be healthy circulation rather than a cool undertone indicator.</div>
+<div class="notes"><strong>Tester Notes</strong>I wear Warm Beige in YSFS. Everything else correct. 
+
+One suggestion: adjust the YSFS coverage to say “Medium to Full” not just full.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Emily</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">may 5, 5:01am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>09</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see your natural skin clearly in this well-lit photo. Your jawline and forehead show a beautiful light-medium complexion with balanced undertones - no strong pink or yellow cast, just that perfect neutral tone that works with so many shades. The natural lighting from your kitchen gives me a clear read on your true skin tone, and I don&#x27;t see any redness or concerns that would affect product recommendations.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Emily</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+</span>
+<span class="date">may 5, 4:59am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>09</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see your skin has a lovely light-medium depth with a balanced, neutral undertone - no strong pink or yellow cast visible along your jawline and neck area. The warm indoor lighting is creating a slight golden glow, but your natural tone appears beautifully neutral. Your complexion looks healthy with some natural freckles, and I don&#x27;t see any significant redness or concerns that would affect shade matching.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Rhonda Battenfelder</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White, not hispanic</span>
+</span>
+<span class="date">apr 29, 7:58pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Pinky Bronze, Dusty Rose, Miami Beach, Ballerina, Pink Champagne, Au Natural, </b></div>
+<div class="dr"><span>Actual WTF</span><b>Light</b></div>
+<div class="dr"><span>Actual FP</span><b>07, 05, 09 (02 under eyes) and Fair Pink corrector </b></div>
+<div class="dr"><span>Ethnicity</span><b>White, not hispanic</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a light complexion with natural daylight from the car windows, which helps with accuracy. Your jawline and forehead show a balanced tone without strong pink or yellow casting. There&#x27;s some natural rosiness in your cheeks, but this appears to be from blood flow rather than a cool undertone. Your overall coloring reads as neutral light skin that would work beautifully with balanced shades.</div>
+<div class="notes"><strong>Tester Notes</strong>This was excellent! The first attempt that didn’t send through was a little off, but I realized the visor was down in the car so it made my skin appear darker than it is in real life. I tried to submit that attempt, so I apologize it didn’t go through. Once I realized everything was too dark, I put the visor up and retook my photo. The results were great! The Miracle Balm shades suggested work for me, but they are not my favorite shades. All of the color matching worked perfectly! Thank you!</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Meagan Bush</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">Caucasian</span>
+</span>
+<span class="date">apr 27, 3:12pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Miami Beach, cocoa bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Medium </b></div>
+<div class="dr"><span>Actual FP</span><b>10, light peach </b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see your natural skin tone clearly in this bare-face photo. Your jawline and forehead show a light complexion with a balanced undertone - no strong pink or yellow cast, which indicates neutral. There&#x27;s some natural rosiness in your cheeks, but this appears to be circulation rather than a cool undertone indicator. The indoor lighting creates some warmth in the photo, but your underlying tone reads as beautifully neutral.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Margaret Koenig</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">German, Italian, Irish</span>
+</span>
+<span class="date">apr 26, 6:38pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-11, Eye: 07-09</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed golden hour pinched cheeks flushed Miami Beach cheeky</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>6, 8</b></div>
+<div class="dr"><span>Ethnicity</span><b>German, Italian, Irish</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see you have a light-medium complexion with a warm, golden undertone. The natural outdoor lighting shows your skin has a subtle yellow-golden cast, particularly visible along your jawline and neck. Your skin appears to have some sun exposure which adds to the warm tone, and I don&#x27;t see any pink or cool gray undertones that would suggest a cooler classification.</div>
+<div class="notes"><strong>Tester Notes</strong>This version with high confidence showed a warm undertone. Previous attempt with medium confidence showed a neutral undertone. I think warm is more accurate. Face pencil was off by one in this iteration, but accurate in the previous try</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Jen Mulder</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 26, 4:11pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty rose</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>08</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the natural light in this photo, I can see you have a beautiful light-medium complexion with balanced neutral undertones. Your skin doesn&#x27;t pull strongly pink or yellow - it has that perfect neutral balance that works well with a variety of shades. The natural lighting gives me a clear view of your true skin tone, and I can see consistent coloring from your face to what&#x27;s visible of your neck area.</div>
+<div class="notes"><strong>Tester Notes</strong>I have a question about the face pencils. When it says 08-10, does it also mean to include 09? It may be better to say 08 and/or 10, to avoid confusion.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Margaret</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+</span>
+<span class="date">apr 26, 4:05pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed, flushed, pinched cheeks, cheeky, golden hour, magic hour </b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>6,8</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the area around your neck, I can see you have a lovely light-medium complexion with balanced neutral undertones - no strong pink or yellow cast. The natural outdoor lighting helps show your true skin tone well, though there&#x27;s a slight front-lighting effect from the selfie angle that I&#x27;ve adjusted for in my assessment.</div>
+<div class="notes"><strong>Tester Notes</strong>Undertones shown as neutral. I’m sometimes told neutral and I’m sometimes told warm.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="should-be-warm" data-notes="1">
+<summary>
+<span class="ename">Danielle Freda</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-wrong">✗ UT: Should be Warm</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White. </span>
+</span>
+<span class="date">apr 25, 8:29pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Warm</b></div>
+<div class="dr"><span>Actual MB</span><b>Tawny and flushed. Also all the other ones...</b></div>
+<div class="dr"><span>Actual WTF</span><b>Medium honey</b></div>
+<div class="dr"><span>Actual FP</span><b>—</b></div>
+<div class="dr"><span>Ethnicity</span><b>White. </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see your skin tone along your jawline and neck area, which appears to be a light-medium depth with a balanced, neutral undertone - no strong pink or yellow cast. The warm indoor lighting in this photo may be adding some golden tones, but your natural skin appears neutral. Your complexion looks healthy and even-toned, which will work beautifully with our neutral-leaning shade recommendations.</div>
+<div class="notes"><strong>Tester Notes</strong>I&#x27;ve done this in all kinds of lighting. I was always told I was warm complected not neutral.. maybe try again..but this is the closest match of all so far. The foundation is a bit off..</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Eden S</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">apr 25, 11:44am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed, Tawny, Chic, Pinky Bronze, Golden Hour</b></div>
+<div class="dr"><span>Actual WTF</span><b>Medium (and Medium Honey) </b></div>
+<div class="dr"><span>Actual FP</span><b>11, 13</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a lovely light-medium complexion with balanced neutral undertones. Your skin doesn&#x27;t lean strongly pink or yellow - it has that perfect neutral quality that works beautifully with a range of shades. The natural lighting in this photo gives me a clear view of your true skin tone, and I can see some natural freckles which is helpful for matching. Your complexion appears even and healthy overall.</div>
+<div class="notes"><strong>Tester Notes</strong>Same photo I’ve been using for all the tests</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="should-be-warm" data-notes="0">
+<summary>
+<span class="ename">Jami </span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-wrong">✗ UT: Should be Warm</span>
+<span class="pill pill-neutral">medium</span>
+</span>
+<span class="date">apr 25, 11:24am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Warm</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty rose, pinky</b></div>
+<div class="dr"><span>Actual WTF</span><b>Porcelain or Lighy</b></div>
+<div class="dr"><span>Actual FP</span><b>9-11 </b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a light-medium complexion with balanced undertones - no strong yellow or pink cast visible along the jawline and neck area. The skin appears to have a neutral base without leaning distinctly warm or cool. The indoor lighting and some visible makeup make assessment slightly challenging, but the overall tone suggests a classic light-medium neutral that would work well with balanced shade options.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Jo</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White </span>
+</span>
+<span class="date">apr 25, 8:37am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Au Natural - Flushed </b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige </b></div>
+<div class="dr"><span>Actual FP</span><b>—</b></div>
+<div class="dr"><span>Ethnicity</span><b>White </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a clear bare-face photo in natural daylight which gives me great visibility of your true skin tone. Your complexion shows a balanced neutral undertone without strong pink or yellow casts - the jawline and forehead read as a classic light-medium depth. I notice some natural rosiness in the cheek area, but this appears to be natural blood flow rather than a cool undertone indicator, as the overall complexion remains beautifully neutral.</div>
+<div class="notes"><strong>Tester Notes</strong>Love this tool!</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="should-be-cool" data-notes="0">
+<summary>
+<span class="ename">Christine</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-wrong">✗ UT: Should be Cool</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White </span>
+</span>
+<span class="date">apr 24, 5:11pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Cool</b></div>
+<div class="dr"><span>Actual MB</span><b>Flushed </b></div>
+<div class="dr"><span>Actual WTF</span><b>Alabaster </b></div>
+<div class="dr"><span>Actual FP</span><b>1</b></div>
+<div class="dr"><span>Ethnicity</span><b>White </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a lovely light-medium complexion with balanced neutral undertones - no strong pink or yellow cast. Your skin has a natural, healthy tone that sits beautifully in that light-medium range. I notice some natural rosiness in your cheeks, but this appears to be natural circulation rather than a cool undertone indicator, as your overall complexion reads neutral and balanced.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Laurie</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White: Irish, Scottish, English, German. </span>
+</span>
+<span class="date">apr 24, 12:14pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Fair</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Fair</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 04-05, Eye: 03-04</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Fair</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Au Naturel, Dusty Rose, Pinched Cheeks, Miami Beach, Chic, Pinky Bronze, Bronze, Tawny, Cocoa Bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Porcelain</b></div>
+<div class="dr"><span>Actual FP</span><b>02, 03, Neutralizer Fair Pink and Fair Peach, </b></div>
+<div class="dr"><span>Ethnicity</span><b>White: Irish, Scottish, English, German. </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see fair skin with a balanced undertone - not strongly pink or golden, which indicates neutral. The natural lighting in your car photo helps show your true skin tone, though there&#x27;s some brightness from the front-facing light. Your complexion appears to have good clarity with minimal redness, making you a great candidate for our Fair shade range with neutral-leaning products.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Katy Frohling</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White non Hispanic </span>
+</span>
+<span class="date">apr 24, 11:47am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Pinched cheeks. Chic. Miami Beach. Flushed </b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige </b></div>
+<div class="dr"><span>Actual FP</span><b>08 and peach pink neutralizer. All correct</b></div>
+<div class="dr"><span>Ethnicity</span><b>White non Hispanic </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Your skin appears to be Light-Medium with a neutral undertone - I can see a balanced tone without strong pink or yellow casts along your jawline and neck area. The indoor lighting creates some warmth in the photo, but your natural coloring seems beautifully neutral. Your complexion looks healthy with no visible redness or concerns that would affect product recommendations.</div>
+<div class="notes"><strong>Tester Notes</strong>I do have some redness on my cheeks which the tool didn’t pick up. Only WTF Beige works to hide. Bronze MB does not which is often recommended. I wish there were more recommendations on the new blush</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Wendy D</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">Caucasian </span>
+</span>
+<span class="date">apr 24, 10:45am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Chic, flushed, Miami Beach, golden hour, sun-kissed, Ballerina, cheeky, au naturel </b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige </b></div>
+<div class="dr"><span>Actual FP</span><b>9,10</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see clear skin with good natural lighting that shows your true tone well. Your jawline and neck area appear to be a light-medium depth with a balanced undertone - not strongly pink or yellow. I do notice some natural redness around your nose and cheek areas, which is quite common and doesn&#x27;t indicate your underlying undertone. The neutral classification will work beautifully for you across all Jones Road products.</div>
+<div class="notes"><strong>Tester Notes</strong>This version was pretty much spot on with everything that I use! Way to go JR team!</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Tanya</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">apr 24, 10:24am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>All of them!</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige!</b></div>
+<div class="dr"><span>Actual FP</span><b>08, 06</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see clear, natural lighting that shows your true skin tone well. Your jawline and forehead show a light-medium depth with a balanced undertone - no strong pink or yellow cast, which indicates neutral. The natural daylight helps me assess your true coloring accurately, and I notice some natural rosiness in your cheeks which is typical circulation rather than a cool undertone.</div>
+<div class="notes"><strong>Tester Notes</strong>This was spot on after visiting the Chicago store and being matched in person!  The only exception is in the store, Miami Beach was recommended as a blusher.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Tanya </span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+</span>
+<span class="date">apr 24, 10:21am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>All!</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>8</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see you have a light complexion with a balanced, neutral undertone - no strong pink or yellow cast. There&#x27;s some natural rosiness in your cheeks, but that appears to be circulation rather than a cool undertone. The indoor lighting is creating some warmth in the photo, but your natural skin tone comes through as pleasantly neutral without leaning strongly warm or cool.</div>
+<div class="notes"><strong>Tester Notes</strong>I do have rosacea</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="should-be-neutral" data-notes="1">
+<summary>
+<span class="ename">Kristen </span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-wrong">✗ UT: Should be Neutral</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White European </span>
+</span>
+<span class="date">apr 24, 8:43am</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Cool</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Dusty Rose, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Neutral</b></div>
+<div class="dr"><span>Actual MB</span><b>Matches recs</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>01</b></div>
+<div class="dr"><span>Ethnicity</span><b>White European </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a clear cool undertone with pink tones visible in the cheeks and a subtle pink cast along the jawline. The skin appears to be light-medium depth with good natural lighting showing true color. There&#x27;s some natural rosiness in the complexion which supports the cool classification, and the overall tone has that classic cool-toned fairness without any yellow or golden cast.</div>
+<div class="notes"><strong>Tester Notes</strong>No makeup, by the window, morning</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Wendy</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 10:48pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Chic, Dusty rose</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige </b></div>
+<div class="dr"><span>Actual FP</span><b>7</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a lovely light-medium complexion with balanced undertones - no strong pink or yellow cast, just beautiful neutral skin. The natural lighting in this photo gives me a clear view of your true skin tone, and I don&#x27;t see any significant redness or discoloration that would affect product matching.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Lisa Mountjoy</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">caucasian</span>
+</span>
+<span class="date">apr 23, 9:56pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Fair</b></div>
+<div class="dr"><span>Undertone</span><b>Cool</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Dusty Rose, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Fair</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 04-05, Eye: 03-04</b></div>
+<div class="dr"><span>Rec FS</span><b>Porcelain</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty Rose, Chic</b></div>
+<div class="dr"><span>Actual WTF</span><b>JETM &amp; WTF - Fair</b></div>
+<div class="dr"><span>Actual FP</span><b>5, 2 undereye, Light Peachy Pink for neutralizer</b></div>
+<div class="dr"><span>Ethnicity</span><b>caucasian</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see fair skin with a subtle pink undertone, particularly noticeable in the cheeks and overall complexion. The skin appears to have a cool cast rather than yellow or golden tones. The lighting creates some contrast but I can assess the natural skin tone from the jawline and face overall, which reads as fair with cool pink undertones.</div>
+<div class="notes"><strong>Tester Notes</strong>Face pencils were a little off but I don&#x27;t use them very often.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Vicki</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 8:46pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty Rose, Chic, Miami Beach</b></div>
+<div class="dr"><span>Actual WTF</span><b>Light</b></div>
+<div class="dr"><span>Actual FP</span><b>Light peach</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see your skin has a balanced tone without strong pink or yellow undertones - your jawline and neck area show a neutral base that&#x27;s neither cool nor warm. The indoor lighting is washing you out a bit, but looking at the less illuminated areas around your jawline, you appear to be in the Light category with neutral undertones that would work beautifully with our balanced shade range.</div>
+<div class="notes"><strong>Tester Notes</strong>This was right on for me!!</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Emily</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 8:30pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty rose, Miami </b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige </b></div>
+<div class="dr"><span>Actual FP</span><b>10</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>You have a lovely light-medium complexion with balanced neutral undertones - I can see this clearly along your jawline and neck area. The natural outdoor lighting shows your skin has neither a strong pink nor yellow cast, making you a perfect neutral. Your complexion appears even and healthy with no significant redness or discoloration to work around.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Molly</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 7:51pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Happy hour natural chic flushed</b></div>
+<div class="dr"><span>Actual WTF</span><b>—</b></div>
+<div class="dr"><span>Actual FP</span><b>Light peachy peach 4 10</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see you have a lovely light-medium complexion with balanced neutral undertones - no strong pink or yellow cast, just a natural, even tone. The natural outdoor lighting gives me a clear view of your true skin tone, and I notice your face and neck match well, which helps confirm this assessment.</div>
+<div class="notes"><strong>Tester Notes</strong>I use 3 photos one inside and 2 outside at different times of day. All three returned the same results.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="should-be-warm" data-notes="1">
+<summary>
+<span class="ename">Danielle</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-wrong">✗ UT: Should be Warm</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 7:08pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Warm</b></div>
+<div class="dr"><span>Actual MB</span><b>Tawny, flushed, sunkissed</b></div>
+<div class="dr"><span>Actual WTF</span><b>Medium honey</b></div>
+<div class="dr"><span>Actual FP</span><b>8 and 9</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the areas around your glasses, I can see you have a light-medium complexion with balanced neutral undertones - no strong pink or yellow cast. The natural light from the window gives me a good read on your true skin tone, though the front-facing lighting may be washing you out slightly, so I&#x27;m leaning toward the medium end of light-medium to ensure the best match.</div>
+<div class="notes"><strong>Tester Notes</strong>I was not near window..but noticed my wtf is too dark. I THINK beige would be a better color or medium...but medium was way too yellow..I am wearingJETMmedium honey..perfect color on that one...as for powder..not light. Use medium or rose..this was the best color match yet..</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Natasha Rastogi</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">apr 23, 6:51pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Tawny, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-12, Eye: 08-10</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Medium</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Tawny, Dusty Rose</b></div>
+<div class="dr"><span>Actual WTF</span><b>Medium Honey</b></div>
+<div class="dr"><span>Actual FP</span><b>15</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a clear medium-depth complexion with warm golden undertones visible along the jawline and neck area. The skin has a natural warmth without any pink or cool gray cast, and the natural lighting in this kitchen setting gives me a good read on the true skin tone. There&#x27;s no visible redness or rosacea, making this a straightforward warm undertone classification.</div>
+<div class="notes"><strong>Tester Notes</strong>The miracle balms colours that it recommended (other than Tawny, au natural and pinky bronze) don’t work well for me (IMO).  I think the result is too light for WTF and face pencils</div>
+</div></details>
+<details class="entry" data-skin="way-off" data-ut="should-be-cool" data-notes="1">
+<summary>
+<span class="ename">Krista Baran</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Way Off</span>
+<span class="pill pill-wrong">✗ UT: Should be Cool</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 6:44pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Way Off</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Cool</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty rose, pinched cheeks and flush</b></div>
+<div class="dr"><span>Actual WTF</span><b>Porcelain </b></div>
+<div class="dr"><span>Actual FP</span><b>2 and 3</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>This is a great natural light photo that shows your true skin tone clearly. Your complexion appears to be light-medium with a beautifully balanced neutral undertone - I can see there&#x27;s no strong pink or yellow cast along your jawline and neck area. The natural outdoor lighting gives me an accurate read on your skin, and I notice some natural rosiness in your cheeks which is typical circulation rather than a cool undertone indicator.</div>
+<div class="notes"><strong>Tester Notes</strong>Neutralizer fair pink</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Janet Henry</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">Caucasian </span>
+</span>
+<span class="date">apr 23, 6:40pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>—</b></div>
+<div class="dr"><span>Actual WTF</span><b>—</b></div>
+<div class="dr"><span>Actual FP</span><b>—</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see your skin has a light complexion with a balanced undertone - no strong pink or yellow cast visible along your jawline and neck area. There&#x27;s some natural redness around your nose area, but this appears to be surface redness rather than an indication of cool undertones. The lighting in this photo creates some shadows but I can still assess your natural skin tone, which appears to be a classic light neutral.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Lisa</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">Black</span>
+</span>
+<span class="date">apr 23, 6:20pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium-Dark</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Pinched Cheeks, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium Honey</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 13-15, Eye: 11-13</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Honey</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed, Miami Beach, Tawny, Bronze, Noir, Au Natural, Cocoa Bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Mix of almond and cinnamon.</b></div>
+<div class="dr"><span>Actual FP</span><b>19, 20</b></div>
+<div class="dr"><span>Ethnicity</span><b>Black</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a beautiful medium-dark complexion with clear warm golden undertones throughout the jawline and forehead. The skin has a lovely golden-brown richness that indicates warm undertones rather than neutral or cool. The natural lighting in this photo gives me a great view of your true skin tone, and I can see the consistent warmth across your face and what&#x27;s visible of your neck area.</div>
+<div class="notes"><strong>Tester Notes</strong>I think the Med Honey WTF is way too light for me. The miracle balm shades were spot on. I think I could go lighter with the face pencils than I have now, but 13-15 seem too light. I could probably use 18. I do wish I could purchase a sample of the WTF.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Debbie Hayes </span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">Caucasian </span>
+</span>
+<span class="date">apr 23, 6:04pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty rose, magic hour, pinky bronze </b></div>
+<div class="dr"><span>Actual WTF</span><b>Alabaster </b></div>
+<div class="dr"><span>Actual FP</span><b>1</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see your natural skin tone along the jawline and neck area, which appears to be in the Light range with a balanced undertone - not strongly pink or yellow. I notice some redness on your cheeks and nose area, which is common and doesn&#x27;t affect your overall undertone classification. The neutral undertone means you&#x27;ll work well with a range of shades that aren&#x27;t too warm or too cool.</div>
+<div class="notes"><strong>Tester Notes</strong>Wearing no makeup in photo in bright sun.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Elizabeth Pennington</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">Caucasian</span>
+</span>
+<span class="date">apr 23, 5:57pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Pinched cheeks and tawny, also sunkissed </b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>8 and 9</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see you have a lovely light-medium complexion with balanced undertones - no strong pink or yellow cast, which indicates neutral. I notice some natural rosiness in your cheeks, but this appears to be healthy circulation rather than a cool undertone indicator. The indoor lighting is creating some brightness on your face, but your neck and jawline show consistent neutral tones throughout.</div>
+<div class="notes"><strong>Tester Notes</strong>This one was absolutely perfect! I find that most of the time, I am matched too light, and I end up looking pale and sick. The beige is what I’ve worn from the beginning, as it’s so sheer but still gives me the coverage I love with a glow. Also, I have never actually gotten a recommendation for Tawny even though it’s my favorite, so this tool really seems to hit the nail on the head! This one is perfect!</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Andrea</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+</span>
+<span class="date">apr 23, 5:46pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty Rose, Pinky Bronze, Flushed, Magic Hour, Golden Hour</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>08</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the natural lighting in this photo, I can see you have a light-medium complexion with balanced undertones - no strong pink or yellow cast. The indoor lighting and front-facing angle make your skin appear slightly lighter than it likely is in natural light, so I&#x27;m leaning toward the medium end of light-medium to ensure the perfect match. Your skin has a healthy, neutral base that would work beautifully with our versatile shades.</div>
+<div class="notes"><strong>Tester Notes</strong>No makeup, indoor daylight</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Sujatha</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">apr 23, 5:41pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Tawny, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-12, Eye: 08-10</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Medium</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Bronze, Chic, Cocoa Bronze, Miami Beach</b></div>
+<div class="dr"><span>Actual WTF</span><b>Honey</b></div>
+<div class="dr"><span>Actual FP</span><b>—</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a beautiful medium-depth complexion with clear warm golden undertones throughout the jawline and neck area. The natural daylight from the window shows the skin&#x27;s true warmth beautifully, and there&#x27;s a lovely golden cast that&#x27;s consistent across the face and visible neck area. The undertone definitely leans warm rather than neutral.</div>
+</div></details>
+<details class="entry" data-skin="too-light" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Debbie Cardozo</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Light</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">African American, Cape Verdean </span>
+</span>
+<span class="date">apr 23, 5:31pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Tawny, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-12, Eye: 08-10</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Medium</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Light</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty Rose, Au Naturel, Cocoa Bronze, Pinky Bronze, Pinched Cheeks, Noir, Apre, Sunkissed, Tawny, Cheeky </b></div>
+<div class="dr"><span>Actual WTF</span><b>Medium Honey</b></div>
+<div class="dr"><span>Actual FP</span><b>15 or 16, Medium Peachy Pink </b></div>
+<div class="dr"><span>Ethnicity</span><b>African American, Cape Verdean </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a clear medium-depth complexion with warm golden undertones evident in the jawline and forehead areas. The skin has a beautiful golden-yellow cast that&#x27;s consistent across the face and appears natural rather than from lighting. There&#x27;s good natural lighting in this photo which allows me to assess the true skin tone accurately.</div>
+<div class="notes"><strong>Tester Notes</strong>took out utensils at my disoat her station desk, blue lighting from computer screens</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Carey</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 5:11pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Pinched Cheeks, Chic, Flushed, </b></div>
+<div class="dr"><span>Actual WTF</span><b>Fair for both</b></div>
+<div class="dr"><span>Actual FP</span><b>“06” “08”</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Your skin appears to be a light-medium tone with a balanced, neutral undertone. I can see your jawline and neck area have a lovely even tone without strong pink or yellow casts. The natural outdoor lighting helps show your true coloring, though the angle makes it a bit challenging to see the full neck comparison. Your complexion looks healthy and balanced - perfect for our neutral-toned shades!</div>
+<div class="notes"><strong>Tester Notes</strong>Was pretty accurate!</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="should-be-cool" data-notes="0">
+<summary>
+<span class="ename">Beth</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-wrong">✗ UT: Should be Cool</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 5:09pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Cool</b></div>
+<div class="dr"><span>Actual MB</span><b>Flushed, pinched cheeks</b></div>
+<div class="dr"><span>Actual WTF</span><b>Fair</b></div>
+<div class="dr"><span>Actual FP</span><b>5</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see clear natural lighting on your bare face, which gives me a great read on your skin tone. Your jawline and forehead show a light complexion with balanced undertones - no strong pink or yellow cast. I do notice some natural redness in your cheeks and around your nose area, but this appears to be surface redness rather than an undertone indicator, so I&#x27;d recommend avoiding overly pink products that might amplify this.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Federica</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">European</span>
+</span>
+<span class="date">apr 23, 5:05pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty rose pinky bronze au natural</b></div>
+<div class="dr"><span>Actual WTF</span><b>Light</b></div>
+<div class="dr"><span>Actual FP</span><b>7-8</b></div>
+<div class="dr"><span>Ethnicity</span><b>European</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see your skin has a lovely light-medium depth with a balanced, neutral undertone - no strong pink or yellow cast visible along your jawline and neck area. The indoor lighting appears to be washing you out slightly, so I&#x27;m accounting for that and leaning toward the medium side to ensure your shade match has enough depth. Your skin looks healthy and even-toned overall.</div>
+<div class="notes"><strong>Tester Notes</strong>Would never use chic MB all over!!!!!</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Lisa Wanderman</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">Caucasian, Ashkenazi Jewish</span>
+</span>
+<span class="date">apr 23, 4:58pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Flushed, Miami Beach, Pinched Cheeks</b></div>
+<div class="dr"><span>Actual WTF</span><b>Light</b></div>
+<div class="dr"><span>Actual FP</span><b>06</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian, Ashkenazi Jewish</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a lovely light-medium complexion with balanced neutral undertones - no strong pink or yellow cast dominates. Your skin has a natural, even tone that sits beautifully in that light-medium range. The indoor lighting appears to be washing you out slightly, so I&#x27;m accounting for that natural depth that would show more in daylight.</div>
+<div class="notes"><strong>Tester Notes</strong>I used the same barefaced photo taken in filtered sunlight that I have used the last several versions of this quiz. I am a Fair to Light Neutral Olive. This time, the quiz went too dark, I am not a Light/Medium! Some of the recommendations were OK (Pinched Cheeks) and some were off (Beige WTF is too brown on me.) Also, Sunkissed, Tawny, and Chic are not very good on me. I do better with Flushed, Miami Beach, Pinched Cheeks. The quiz also missed my brown undereye circles: I wear Light Peach and not the Light Peachy Pink recommended. The quiz was better for me last time. I think this version is not recognizing my olive complexion.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Tara</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 4:57pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Bronze cocoa bronze punky bronze noir</b></div>
+<div class="dr"><span>Actual WTF</span><b>—</b></div>
+<div class="dr"><span>Actual FP</span><b>—</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the visible areas of your face, I can see you have a light-medium complexion with a balanced, neutral undertone - no strong pink or yellow cast. The lighting from the window behind you is creating some brightness on your face, but I can still assess your natural skin tone from the shadowed areas. Your skin appears healthy with no significant redness or concerns that would affect shade matching.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Anne McPherson</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 4:54pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>All of them!</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>09, 19</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the visible areas of your neck, I can see you have a lovely light-medium complexion with balanced neutral undertones. While there&#x27;s some front-facing lighting that&#x27;s brightening your face slightly, your natural skin tone shows through beautifully with no strong pink or yellow cast - just that perfect neutral balance that works so well with a range of shades.</div>
+<div class="notes"><strong>Tester Notes</strong>I tried it twice and it does depend a bit if I’m outside inside what the lighting is, but overall it nailed it both times about the beige and the face pencil numbers and I think this is the best test yet. Thank you.</div>
+</div></details>
+<details class="entry" data-skin="way-off" data-ut="should-be-cool" data-notes="0">
+<summary>
+<span class="ename">Kim</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Way Off</span>
+<span class="pill pill-wrong">✗ UT: Should be Cool</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">Caucasian</span>
+</span>
+<span class="date">apr 23, 4:43pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Way Off</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Cool</b></div>
+<div class="dr"><span>Actual MB</span><b>Pinky Bronze, Sun-kissed </b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>08, 11</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a lovely light-medium complexion with balanced undertones - no strong pink or yellow cast, which indicates neutral. The natural lighting in this photo gives me a clear view of your true skin tone, and I notice the neck and face match well, which is always a good sign for accurate shade matching.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Melissa Conklin</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">Irish Russian </span>
+</span>
+<span class="date">apr 23, 4:39pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty rose pinched cheeks pinky bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Fair</b></div>
+<div class="dr"><span>Actual FP</span><b>5 but I think it’s too light </b></div>
+<div class="dr"><span>Ethnicity</span><b>Irish Russian </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see you have a lovely light-medium complexion with balanced undertones - no strong pink or yellow cast, which indicates neutral. The lighting appears to be indoor with some warm tones from the background, but your skin shows that beautiful neutral balance that works well with a range of shades. Your complexion has nice clarity and evenness.</div>
+<div class="notes"><strong>Tester Notes</strong>I was wearing makeup and photo taken inside</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Deborah </span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 4:38pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Tawny and flushed mostly </b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory winter beige summer</b></div>
+<div class="dr"><span>Actual FP</span><b>4. 6.  8</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a light complexion with balanced undertones - no strong pink or yellow cast is evident in the jawline and neck area. The natural indoor lighting shows skin that appears neither cool nor warm-toned, indicating a neutral undertone. The overall skin depth falls into the light category, though the lighting makes it a bit challenging to assess with complete certainty.</div>
+<div class="notes"><strong>Tester Notes</strong>This is the second time I have been recommended for light wtf and Jetm and now am worried I am wearing the wrong shade now.    So it’s confused me a bit.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Rosemary Haynes</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">Caucasian</span>
+</span>
+<span class="date">apr 23, 4:35pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Tawny, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Medium</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-12, Eye: 08-10</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Medium</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Nailed it! Tawny, Sunkissed, Miami Beach, Flushed, Cheeky, occasionally Cocoa Bronze and very rarely Chic</b></div>
+<div class="dr"><span>Actual WTF</span><b>Medium! Yay!</b></div>
+<div class="dr"><span>Actual FP</span><b>08 under eye, 11 on face</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see you have a medium depth complexion with a balanced, neutral undertone - no strong pink or yellow cast. The natural outdoor lighting gives me a clear view of your true skin tone, and I notice some natural freckling and sun spots which are common with medium skin. Your neck and face appear well-matched in tone, confirming this assessment.</div>
+<div class="notes"><strong>Tester Notes</strong>Excellent! I am Medium-leaning Warm and this was great! And I may order the darker Neutralizer pencil recommended.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Krista McDunn</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">Caucasian</span>
+</span>
+<span class="date">apr 23, 4:34pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Pinky Bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>04, 05, 06</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a balanced complexion with no strong pink or yellow cast along the jawline and neck area. The skin has a natural, neutral tone without obvious warm or cool leanings. There&#x27;s some slight redness around the nose area which appears to be natural coloring rather than indicating a cool undertone. The indoor lighting may be slightly washing out the depth, so I&#x27;m leaning toward Light-Medium rather than Light to ensure proper coverage.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Lorrie</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">Italian- American </span>
+</span>
+<span class="date">apr 23, 4:27pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Cocoa bronze, chic, pinky bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>9, 11</b></div>
+<div class="dr"><span>Ethnicity</span><b>Italian- American </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a light-medium complexion with balanced undertones - no strong pink or yellow cast visible. The lighting appears to be indoor/warm which could be washing out some depth, so I&#x27;m leaning toward the medium end of light-medium. The skin appears healthy and even-toned with neutral undertones that would work well with our versatile shade range.</div>
+<div class="notes"><strong>Tester Notes</strong>This is the closest shade quiz!!! You did it!!</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Jamie Robinson</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">Caucasian</span>
+</span>
+<span class="date">apr 23, 4:23pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed, pinched cheeks, Miami Beach, chic, noir, pinky bronze</b></div>
+<div class="dr"><span>Actual WTF</span><b>I wear beige in winter and medium honey in summer</b></div>
+<div class="dr"><span>Actual FP</span><b>8-10</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a clear, natural light photo showing light-medium depth skin with balanced undertones. The jawline and forehead show no strong pink or yellow cast, indicating neutral undertones. There&#x27;s some natural rosiness in the cheeks and slight redness around the nose area, but this appears to be surface redness rather than cool undertones - the overall skin reads as beautifully balanced and neutral.</div>
+<div class="notes"><strong>Tester Notes</strong>This quiz was the most spot on yet. Great job!</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Jen</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+</span>
+<span class="date">apr 23, 4:14pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty rose</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>06</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a light-medium complexion with balanced undertones - no strong pink or yellow cast visible along the jawline and forehead. The skin appears to have a natural, neutral base without leaning definitively warm or cool. The indoor lighting and angle make it slightly challenging to assess, but the overall tone suggests a neutral undertone that would work well with versatile shades.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="should-be-cool" data-notes="1">
+<summary>
+<span class="ename">Kim</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-wrong">✗ UT: Should be Cool</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">Caucasian </span>
+</span>
+<span class="date">apr 23, 4:11pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Cool</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty Rose </b></div>
+<div class="dr"><span>Actual WTF</span><b>Porcelain or Light</b></div>
+<div class="dr"><span>Actual FP</span><b>5</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the natural tone along your neck, I see a light complexion with a balanced undertone that doesn&#x27;t lean strongly pink or yellow. The indoor lighting is creating some warmth in the photo, but examining the shadow areas and your natural skin tone, you appear to have a neutral undertone. There&#x27;s some natural rosiness in your cheeks, but this appears to be circulation rather than a cool pink undertone.</div>
+<div class="notes"><strong>Tester Notes</strong>Some makeup on</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Michelle Georges</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+</span>
+<span class="date">apr 23, 4:05pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Flushed the most, dusty rose and cheeky- came in a kit,meh meh,</b></div>
+<div class="dr"><span>Actual WTF</span><b>Would choose beige - have not bought yet</b></div>
+<div class="dr"><span>Actual FP</span><b>I would go with the peachy pink as suggested</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and chest area, I can see a beautiful light-medium complexion with balanced neutral undertones - no strong pink or yellow cast. Your skin has a natural, healthy glow with some lovely freckles across your chest. The natural lighting in this photo gives me a clear view of your true skin tone, and I&#x27;m confident in recommending shades that will complement your balanced, neutral complexion perfectly.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="should-be-neutral" data-notes="1">
+<summary>
+<span class="ename">Kimberly Glinert</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-wrong">✗ UT: Should be Neutral</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White </span>
+</span>
+<span class="date">apr 23, 3:58pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Neutral</b></div>
+<div class="dr"><span>Actual MB</span><b>All of them!  But all the ones you named the most</b></div>
+<div class="dr"><span>Actual WTF</span><b>—</b></div>
+<div class="dr"><span>Actual FP</span><b>04</b></div>
+<div class="dr"><span>Ethnicity</span><b>White </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see clear, natural lighting on your bare face which gives me a great read on your skin tone. Your complexion appears to be a true Light tone with balanced neutral undertones - I don&#x27;t see strong pink or yellow casts, just a lovely balanced complexion. Your chest area shows some sun exposure which is common, but your facial tone is consistent and would work beautifully with our Light shade range.</div>
+<div class="notes"><strong>Tester Notes</strong>Minimal jones road MU on… at natural, light tan bronzer, 04 face pencil. Very accurate - except I use WTF Fair</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Joann</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 3:52pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Au Natural , Flushed </b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>—</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a light-medium complexion with balanced undertones - no strong pink or yellow cast. The indoor lighting and front-facing angle make your face appear slightly lighter than your natural tone, but your neck shows good depth. I don&#x27;t see definitive cool or warm indicators, so neutral undertone suits you best.</div>
+<div class="notes"><strong>Tester Notes</strong>Very cool tool!</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Laura Perlman</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">White</span>
+</span>
+<span class="date">apr 23, 3:46pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed</b></div>
+<div class="dr"><span>Actual WTF</span><b>Beige</b></div>
+<div class="dr"><span>Actual FP</span><b>Many</b></div>
+<div class="dr"><span>Ethnicity</span><b>White</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a light-medium complexion with balanced undertones - no strong pink or yellow cast visible along the jawline and forehead. The lighting appears to be indoor/artificial which may be washing out some depth, so I&#x27;m leaning toward the medium end of light-medium. The skin appears healthy with neutral undertones that would work well with balanced shades.</div>
+<div class="notes"><strong>Tester Notes</strong>This got VERY close!!  Great work!!</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Mary Dees</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">white, italian</span>
+</span>
+<span class="date">apr 23, 3:42pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>above are correct</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>03, 04</b></div>
+<div class="dr"><span>Ethnicity</span><b>white, italian</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a light-medium complexion with balanced undertones - no strong pink or yellow cast, which indicates neutral. The lighting appears to be indoor/frontal which can wash out skin slightly, so I&#x27;m accounting for that depth. Your skin has a healthy, even tone without visible redness or strong warm/cool directional pulls.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Maryann Gallagher</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+</span>
+<span class="date">apr 23, 3:40pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>—</b></div>
+<div class="dr"><span>Actual WTF</span><b>Light </b></div>
+<div class="dr"><span>Actual FP</span><b>6</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see you have a beautiful light-medium complexion with balanced neutral undertones - no strong pink or yellow cast. The lighting appears to be indoor/frontal which can wash out depth slightly, but your neck and shadow areas show good medium tone. Your skin has that perfect neutral balance that works well with a range of shades.</div>
+<div class="notes"><strong>Tester Notes</strong>This definitely still needs work. The shades still don’t come close to the correct shades.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Mary Dees</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">White, Italian</span>
+</span>
+<span class="date">apr 23, 3:39pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>above are correct</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>03, 04</b></div>
+<div class="dr"><span>Ethnicity</span><b>White, Italian</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and the visible neck area, I can see a balanced light-medium complexion without a strong warm or cool cast. Your skin appears to have neutral undertones - not pulling pink or yellow in any particular direction. The natural lighting in this photo gives me a clear read on your true skin tone, and I don&#x27;t see any significant redness or discoloration that would affect shade matching.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Mary Dees</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">white, Italian</span>
+</span>
+<span class="date">apr 23, 3:38pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Above shades are correct</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>03, 04</b></div>
+<div class="dr"><span>Ethnicity</span><b>white, Italian</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Your skin has a lovely balanced tone without strong pink or yellow undertones - it&#x27;s that classic neutral complexion that works beautifully with most shades. I can see your jawline and forehead have consistent coloring, and while there&#x27;s some natural lighting variation in this outdoor photo, your skin appears to be in the light-medium range with no obvious warm or cool cast.</div>
+<div class="notes"><strong>Tester Notes</strong>This has been the closest of all of my tries so far.  It is still reading my coloring a shade darker than it is regardless of the lighting.  It is doing a better job with the undertone with outdoor lighting.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Mary Dees</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">white, Italian descent</span>
+</span>
+<span class="date">apr 23, 3:35pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Above shades are correct</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>03, 04</b></div>
+<div class="dr"><span>Ethnicity</span><b>white, Italian descent</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see your skin tone along the jawline and neck area, which appears to be in the light-medium range with balanced undertones - not strongly pink or yellow. The lighting appears to be natural daylight coming from above, which is helpful for assessment. Your complexion has a healthy, even tone without strong warm or cool casts, indicating neutral undertones that would work beautifully with versatile shades.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Susan</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">Caucasian - Scottish</span>
+</span>
+<span class="date">apr 23, 3:35pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Flushed, Chic, Miami Beach, Happy Hour</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>06</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian - Scottish</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see you have a lovely light-medium complexion with balanced neutral undertones - no strong pink or yellow cast. The indoor lighting is creating some warmth in the photo, but your natural skin tone appears neutral with good balance. I notice some natural rosiness in your cheeks, but this looks more like healthy circulation rather than a cool undertone indicator.</div>
+<div class="notes"><strong>Tester Notes</strong>Same light as first two - this series seems to see me much darker than the previous versions.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Susan</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">Caucasian - Scottish</span>
+</span>
+<span class="date">apr 23, 3:33pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty Tose, Flushed, Miami Beach, Happy Hour</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>06</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian - Scottish</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a light-medium complexion with balanced undertones - no strong pink or yellow cast. The natural lighting in this photo gives me a clear view of your true skin tone. Your complexion appears even and neutral, which will work beautifully with our versatile shade range.</div>
+<div class="notes"><strong>Tester Notes</strong>Phone a little closer than last and added eyeglasses</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="should-be-neutral" data-notes="0">
+<summary>
+<span class="ename">Mary Dees</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-wrong">✗ UT: Should be Neutral</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">white, Italian descent</span>
+</span>
+<span class="date">apr 23, 3:33pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Warm</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Sunkissed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 09-11, Eye: 07-09</b></div>
+<div class="dr"><span>Rec FS</span><b>Warm Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Neutral</b></div>
+<div class="dr"><span>Actual MB</span><b>dusty rose, sunkissed, pinky bronze, chic, pinched cheeks, all the hours</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>03, 04</b></div>
+<div class="dr"><span>Ethnicity</span><b>white, Italian descent</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see warm golden undertones in your jawline and neck area, which appears slightly deeper than your face (likely due to the outdoor lighting and hat shadow). Your skin has a beautiful warm, peachy-golden cast rather than pink or cool tones. The outdoor lighting and sunglasses make it a bit challenging to assess, but the warm undertones are clearly visible in the exposed areas.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Susan</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">Caucasian - Scottish</span>
+</span>
+<span class="date">apr 23, 3:32pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty Rose, Flushed, Miami Beach, Chic</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>06</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian - Scottish</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a clear bare-face photo with good natural lighting. Your skin tone appears to be Light with a balanced neutral undertone - I don&#x27;t see strong pink or yellow casts, just a lovely balanced complexion. The jawline and neck area show consistent coloring, which helps confirm this assessment. This neutral undertone will work beautifully with a range of Jones Road shades.</div>
+<div class="notes"><strong>Tester Notes</strong>Afternoon light at window, no makeup</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Mary Dees</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">white, Italian descent</span>
+</span>
+<span class="date">apr 23, 3:30pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>sunkissed, pinky bronze, chic, pinched cheeks, dusty rose, golden hour, magic hour, happy hour, champagne</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>03, 04</b></div>
+<div class="dr"><span>Ethnicity</span><b>white, Italian descent</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see you have a light-medium complexion with a beautifully balanced undertone - not strongly pink or yellow, which indicates neutral. The bathroom lighting is washing you out a bit, but examining the shadow areas under your jaw and the side of your neck gives me a clearer read of your true skin tone. Your complexion appears even and healthy with that classic neutral undertone that works so well with Jones Road&#x27;s versatile shades.</div>
+<div class="notes"><strong>Tester Notes</strong>bathroom lighting</div>
+</div></details>
+<details class="entry" data-skin="way-off" data-ut="should-be-cool" data-notes="1">
+<summary>
+<span class="ename">Rayna</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Way Off</span>
+<span class="pill pill-wrong">✗ UT: Should be Cool</span>
+<span class="pill pill-neutral">medium</span>
+</span>
+<span class="date">apr 23, 3:28pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Way Off</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Cool</b></div>
+<div class="dr"><span>Actual MB</span><b>—</b></div>
+<div class="dr"><span>Actual WTF</span><b>—</b></div>
+<div class="dr"><span>Actual FP</span><b>—</b></div>
+<div class="dr"><span>Ethnicity</span><b>—</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see your natural skin tone clearly in this bare-face photo. Your jawline and forehead show a light-medium depth with balanced undertones - no strong pink or yellow cast. The lighting appears to be indoor/frontal which can wash out skin slightly, so I&#x27;m accounting for that and leaning toward the medium end of light-medium. Your undertones appear beautifully neutral with no obvious warm or cool dominance.</div>
+<div class="notes"><strong>Tester Notes</strong>I’m so fair and cool toned. This said I was neutral. Could’ve been lighting but I’ve always been cool leaning with a bit of pink.</div>
+</div></details>
+<details class="entry" data-skin="too-dark" data-ut="yes" data-notes="1">
+<summary>
+<span class="ename">Mary Dees</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Too Dark</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">white, Italian descent</span>
+</span>
+<span class="date">apr 23, 3:28pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light-Medium</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Sunkissed, Highlighter: Golden Hour, All-Over Tint: Chic, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Beige</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 08-10, Eye: 06-08</b></div>
+<div class="dr"><span>Rec FS</span><b>Neutral Beige</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Too Dark</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Sunkissed, chic, pinched cheeks; pinky bronze, pinched cheeks, champagne, happy hour, magic hour, golden hour</b></div>
+<div class="dr"><span>Actual WTF</span><b>Ivory</b></div>
+<div class="dr"><span>Actual FP</span><b>03, 04</b></div>
+<div class="dr"><span>Ethnicity</span><b>white, Italian descent</b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and forehead area, I can see you have a light-medium complexion with balanced undertones - no strong pink or yellow cast, which indicates neutral undertones. The indoor lighting appears to be washing you out slightly, so I&#x27;m accounting for that by going with light-medium rather than light. Your skin appears to have good clarity overall with neutral coloring that would work beautifully with our Beige shade range.</div>
+<div class="notes"><strong>Tester Notes</strong>this was with darker indoor lighting conditions</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="yes" data-notes="0">
+<summary>
+<span class="ename">Mary Schofield Woods</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-correct">✓ UT</span>
+<span class="pill pill-neutral">high</span>
+<span class="pill pill-neutral">My skin tone is typical English/Irish/French. My undertone is Slavic. </span>
+</span>
+<span class="date">apr 23, 3:22pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Cool</b></div>
+<div class="dr"><span>Confidence</span><b>high</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Dusty Rose, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Fair</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty Rose, Flushed, Pinched Cheeks, Aprés, Ballerina, Pinky Bronze. Never Chic (too orange) never Bronze (too warm). These 2 were suggested along with other shades that do work, like Flushed. </b></div>
+<div class="dr"><span>Actual WTF</span><b>Fair. Recommended in store and it’s perfect. </b></div>
+<div class="dr"><span>Actual FP</span><b>5 under eyes, 6 on face</b></div>
+<div class="dr"><span>Ethnicity</span><b>My skin tone is typical English/Irish/French. My undertone is Slavic. </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and forehead, I can see a clear light complexion with cool undertones. The pink cast in your cheeks and the overall cool tone of your skin, especially visible along your jawline, indicates cool undertones rather than warm or neutral. Your skin has that lovely fair-to-light depth that works beautifully with cool-toned products.</div>
+</div></details>
+<details class="entry" data-skin="yes" data-ut="should-be-cool" data-notes="0">
+<summary>
+<span class="ename">Jill Silverman</span>
+<span class="meta-row">
+<span class="pill pill-correct">✓ Skin</span>
+<span class="pill pill-wrong">✗ UT: Should be Cool</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">Jewish </span>
+</span>
+<span class="date">apr 23, 3:12pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Yes</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Cool</b></div>
+<div class="dr"><span>Actual MB</span><b>Several</b></div>
+<div class="dr"><span>Actual WTF</span><b>Light</b></div>
+<div class="dr"><span>Actual FP</span><b>1,2, 8, 11</b></div>
+<div class="dr"><span>Ethnicity</span><b>Jewish </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>I can see a light complexion with balanced undertones - no strong pink or yellow cast visible along the jawline and neck area. The skin appears to have a natural, neutral base without leaning definitively warm or cool. The indoor lighting and angle make it a bit challenging to assess with complete certainty, but the overall tone suggests a classic light, neutral complexion that would work well with versatile shades.</div>
+</div></details>
+<details class="entry" data-skin="way-off" data-ut="should-be-cool" data-notes="1">
+<summary>
+<span class="ename">Robin</span>
+<span class="meta-row">
+<span class="pill pill-wrong">✗ Skin: Way Off</span>
+<span class="pill pill-wrong">✗ UT: Should be Cool</span>
+<span class="pill pill-neutral">medium</span>
+<span class="pill pill-neutral">Caucasian </span>
+</span>
+<span class="date">apr 23, 3:05pm</span>
+</summary>
+<div class="detail"><div class="detail-grid">
+<div><h4>AI Detection</h4>
+<div class="dr"><span>Skin Tone</span><b>Light</b></div>
+<div class="dr"><span>Undertone</span><b>Neutral</b></div>
+<div class="dr"><span>Confidence</span><b>medium</b></div>
+<div class="dr"><span>Rec MB</span><b>Blush: Flushed, Bronzer: Bronze, Highlighter: Golden Hour, All-Over Tint: Flushed, Colorless Glow: Au Naturel</b></div>
+<div class="dr"><span>Rec WTF</span><b>Light</b></div>
+<div class="dr"><span>Rec FP</span><b>Face: 07-08, Eye: 05-06</b></div>
+<div class="dr"><span>Rec FS</span><b>Ivory</b></div>
+</div>
+<div><h4>Tester Feedback</h4>
+<div class="dr"><span>Skin Correct?</span><b>Way Off</b></div>
+<div class="dr"><span>Undertone Correct?</span><b>Should be Cool</b></div>
+<div class="dr"><span>Actual MB</span><b>Dusty Rose, Pinched Cheeks</b></div>
+<div class="dr"><span>Actual WTF</span><b>Fair</b></div>
+<div class="dr"><span>Actual FP</span><b>6, and neutralizer Fair Pink</b></div>
+<div class="dr"><span>Ethnicity</span><b>Caucasian </b></div>
+</div>
+</div>
+<div class="notes"><strong>AI Reasoning</strong>Looking at your jawline and neck area, I can see a light complexion with balanced undertones - no strong pink or yellow cast dominates. The natural window lighting helps show your true skin tone, though there&#x27;s some front-facing brightness that could be washing you out slightly. Your skin appears to have that classic neutral undertone where warm and cool elements are well-balanced, which is perfect for versatile makeup options.</div>
+<div class="notes"><strong>Tester Notes</strong>Lighting conditions were next to a window. I&#x27;ve been shaded matched multiple times by the JRB team (including Bobbi), and Fair is the most common recommendation. Light tends to be more yellow on me.</div>
+</div></details>
+</div>
+</div>
+<script>
+const buttons = document.querySelectorAll('.filter-btn');
+const entries = document.querySelectorAll('.entry');
+buttons.forEach(b => b.addEventListener('click', () => {
+  buttons.forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  const f = b.dataset.f;
+  entries.forEach(e => {
+    const skin = e.dataset.skin;
+    const ut = e.dataset.ut;
+    const notes = e.dataset.notes;
+    let show = true;
+    if (f === 'skin-yes') show = skin === 'yes';
+    else if (f === 'skin-too-dark') show = skin === 'too-dark';
+    else if (f === 'skin-too-light') show = skin === 'too-light';
+    else if (f === 'skin-way-off') show = skin === 'way-off';
+    else if (f === 'ut-no') show = ut && ut !== 'yes' && ut !== '';
+    else if (f === 'notes') show = notes === '1';
+    e.style.display = show ? '' : 'none';
+  });
+}));
+</script>
+</body>
+</html>
